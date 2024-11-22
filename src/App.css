@@ -1,0 +1,48 @@
+.login-container,
+.register-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ff6b6b; /* Softer red border */
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: white; /* White background */
+}
+
+h2 {
+    text-align: center;
+    color: #ff6b6b; /* Softer red text for the heading */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc; /* Light gray border */
+}
+
+input:focus {
+    border-color: #ff6b6b; /* Softer red border on focus */
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff6b6b; /* Softer red background for button */
+    color: white; /* White text on button */
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #e55a5a; /* Darker shade of softer red on hover */
+}

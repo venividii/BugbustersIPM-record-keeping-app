@@ -1,0 +1,20 @@
+/* src/AdminDash.css */
+
+.logout-button,
+.create-button,
+.delete-button {
+    width: auto; /* Set to auto to fit content */
+    padding: 10px 20px; /* Add padding for better appearance */
+    margin: 5px; /* Add margin between buttons */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #ff6b6b; /* Softer red background */
+    color: white; /* White text color */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.logout-button:hover,
+.create-button:hover,
+.delete-button:hover {
+    background-color: #e55a5a; /* Darker shade on hover */
+}
