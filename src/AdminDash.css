@@ -1,20 +1,81 @@
 /* src/AdminDash.css */
 
-.logout-button,
-.create-button,
-.delete-button {
-    width: auto; /* Set to auto to fit content */
-    padding: 10px 20px; /* Add padding for better appearance */
-    margin: 5px; /* Add margin between buttons */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #ff6b6b; /* Softer red background */
-    color: white; /* White text color */
-    cursor: pointer; /* Pointer cursor on hover */
+.admin-dashboard-container {
+    max-width: 800px; /* Limit the width of the dashboard */
+    margin: 20px auto; /* Center the dashboard */
+    padding: 20px; /* Add padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #ffffff; /* White background */
 }
 
-.logout-button:hover,
+h2 {
+    color: #333; /* Darker text color for main heading */
+}
+
+h4 {
+    color: #555; /* Slightly lighter text color for admin greeting */
+}
+
+h3 {
+    color: #555; /* Slightly lighter text color for subheadings */
+}
+
+.form-group {
+    margin-bottom: 15px; /* Space between form groups */
+}
+
+.form-group label {
+    display: block; /* Block display for labels */
+    margin-bottom: 5px; /* Space below labels */
+}
+
+.form-group input {
+    width: 100%; /* Full width input */
+    padding: 10px; /* Padding for input */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #ccc; /* Light gray border for inputs */
+}
+
+.create-button,
+.logout-button,
+.delete-button {
+    padding: 8px; /* Smaller padding for buttons */
+    background-color: #4CAF50; /* Green background for action buttons */
+    color: white; /* White text color */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
 .create-button:hover,
+.logout-button:hover,
 .delete-button:hover {
-    background-color: #e55a5a; /* Darker shade on hover */
+    background-color: #45a049; /* Darker green on hover for action buttons */
+}
+
+.logout-button {
+    background-color: #f44336; /* Red background for logout button */
+}
+
+.logout-button:hover {
+    background-color: #e53935; /* Darker red on hover for logout button */
+}
+
+/* Styles specific to technician table */
+.technician-table {
+    width: 100%; /* Full width table */
+    border-collapse: collapse; /* Collapse borders */
+    margin-top: 20px; /* Space above table */
+}
+
+.technician-table th,
+.technician-table td {
+    border: 1px solid #ddd; /* Border for table cells */
+    padding: 10px; /* Padding for table cells */
+}
+
+.technician-table th {
+    background-color: #f2f2f2; /* Light gray background for header cells */
 }

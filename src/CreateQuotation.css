@@ -1,0 +1,61 @@
+/* src/CreateQuotation.css */
+
+.quotation-container {
+    max-width: 800px; /* Limit the width of the quotation form */
+    margin: 20px auto; /* Center the container */
+    padding: 20px; /* Add padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #ffffff; /* White background */
+}
+
+.form-group {
+    margin-bottom: 15px; /* Space between form groups */
+}
+
+.form-group label {
+    display: block; /* Block display for labels */
+    margin-bottom: 5px; /* Space below labels */
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%; /* Full width inputs */
+    padding: 10px; /* Padding for inputs */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #ccc; /* Light gray border for inputs */
+}
+
+.product-inputs {
+    display: flex;
+    gap: 10px; /* Space between input fields */
+}
+
+.product-table {
+    width: 100%; /* Full width */
+    border-collapse: collapse; /* Collapse borders */
+    margin-top: 10px; /* Space above table */
+}
+
+.product-table th,
+.product-table td {
+    border: 1px solid #ddd; /* Border for table cells */
+    padding: 10px; /* Padding for table cells */
+}
+
+.product-table th {
+    background-color: #f2f2f2; /* Light gray background for header */
+}
+
+button {
+    padding: 10px; /* Padding for buttons */
+    background-color: #4CAF50; /* Green background for buttons */
+    color: white; /* White text color */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
