@@ -1,0 +1,551 @@
+import sqlite3 from 'sqlite3';
+import db from '../database/db.js';  
+sqlite3.verbose();
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const CreateCustomerProfile = (req, res) => {
+    console.log('Request Body:', req.body); 
+
+    const {CFirstName,CLastName,CContact,CreatedBy} = req.body;
+    if (!CFirstName||!CLastName||!CContact||!CreatedBy) {
+        return res.stat=us(400).json({ error: 'Missing required fields' });
+      }
+    const query = 'INSERT INTO CustomerProfile(CFirstName,CLastName,CContact,CreatedBy) VALUES (?,?,?,?)';
+    
+    db.run(query, [CFirstName,CLastName,CContact,CreatedBy], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to create Customer', details: err.message });
+      }
+      res.status(201).json({ message: 'CustomerProfile created', CustomerID: this.lastID });
+    });
+  };
+
+  export const getAllCustomers= (req, res) => {
+    const query = `
+      SELECT 
+        CFirstName
+        CLastName
+        CContact
+        CustomerID
+        CreatedBy
+      FROM 
+        CustomerProfile
+    `;
+  
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        console.error('Error fetching employees:', err.message);
+        return res.status(500).json({
+          error: 'Failed to fetch employees',
+          details: err.message,
+        });
+      }
+  
+      res.json(rows);
+    });
+  };
+
+  export const GetCustomerById = (req, res) => {
+    const CustomerID = req.params.id;
+  
+    const query = `
+      SELECT 
+       CustomerID,
+       CFirstName,
+       CLastName,
+       CContact
+       CreatedBy
+
+      FROM 
+        CustomerProfile
+      WHERE 
+        CustomerID = ?
+    `;
+  
+    db.get(query, [CustomerID], (err, row) => {
+      if (err) {
+        console.error('Error fetching Customer:', err.message);
+        return res.status(500).json({
+          error: 'Failed to fetch Customer',
+          details: err.message,
+        });
+      }
+  
+      if (!row) {
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+      res.json(row);
+    });
+  };
+  
+  
+  export const deleteCustomer = (req, res) => {
+    const { CustomerID } = req.params;
+  
+    if (!CustomerID) {
+        return res.status(400).json({ error: 'BustomerID is required' });
+    }
+  
+    const query = 'DELETE FROM CustomerProfile WHERE CustomerID = ?';
+  
+    db.run(query, [CustomerID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete Customer', details: err.message });
+        }
+  
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+  
+        res.status(200).json({ message: 'Customer deleted successfully' });
+    });
+  };
+
+  export const updateCustomer = (req, res) => {
+    const { CustomerID } = req.params;
+    const { CFirstName, CLastName, CContact,CreatedBy} = req.body; 
+  
+    if (!CustomerID) {
+        return res.status(400).json({ error: 'CustomerID is required' });
+    }
+  
+    if (!CFirstName && !CLastName && !CContact && !CreatedBy) {
+        return res.status(400).json({ error: 'At least one field to update is required' });
+    }
+  
+
+    const fieldsToUpdate = [];
+    const values = [];
+  
+    if (CFirstName) {
+        fieldsToUpdate.push('CFirstName = ?');
+        values.push(CFirstName);
+    }
+    if (CLastName) {
+        fieldsToUpdate.push('CLastName = ?');
+        values.push(CLastName);
+    }
+    if (CContact) {
+        fieldsToUpdate.push('CContact = ?');
+        values.push(CContact);
+    }
+    if (CreatedBy) {
+        fieldsToUpdate.push('CreatedBy = ?');
+        values.push(CreatedBy);
+    }
+    
+    
+  
+    const query = `UPDATE CustomerProfile SET ${fieldsToUpdate.join(', ')} WHERE CustomerID = ?`;
+    values.push(CustomerID);
+  
+    db.run(query, values, function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to update Customer', details: err.message });
+        }
+  
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+  
+        res.status(200).json({ message: 'Customer updated successfully' });
+    });
+  };
+
+
+
+//customer address table
+
+  export const CreateCustomerAddress = (req, res) => {
+  const { CustomerID, Province, City, Barangay, AddLine1, AddLine2 } = req.body;
+
+  if (!CustomerID || !Province || !City || !Barangay || !AddLine1) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const query = `
+    INSERT INTO CustAddress (CustomerID, Province, City, Barangay, AddLine1, AddLine2)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(query, [CustomerID, Province, City, Barangay, AddLine1, AddLine2], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to create address', details: err.message });
+    }
+    res.status(201).json({ message: 'Address created', CustAddID: this.lastID });
+  });
+};
+
+// Read addresses (all or filtered by CustomerProfile)
+export const ReadCustomerAddress = (req, res) => {
+  const { CustomerProfile } = req.query;
+
+  let query = 'SELECT * FROM CustAddress';
+  const params = [];
+
+  if (CustomerProfile) {
+    query += ' WHERE CustomerProfile = ?';
+    params.push(CustomerProfile);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to retrieve addresses', details: err.message });
+    }
+    res.status(200).json(rows);
+  });
+};
+
+// Update an address by CustAddID
+export const UpdateCustomerAddress = (req, res) => {
+  console.log('CustAddID:', req.params.CustAddID);
+  const {CustAddID} = req.params;
+  const { Province, City, Barangay, AddLine1, AddLine2 } = req.body;
+
+  if (!Province && !City && !Barangay && !AddLine1 && !AddLine2){
+    return res.status(400).json({ error: 'At least one field must be updated' });
+  }
+
+  const updates = [];
+  const params = [];
+
+  if (Province) {
+    updates.push('Province = ?');
+    params.push(Province);
+  }
+  if (City) {
+    updates.push('City = ?');
+    params.push(City);
+  }
+  if (Barangay) {
+    updates.push('Barangay = ?');
+    params.push(Barangay);
+  }
+  if (AddLine1) {
+    updates.push('AddLine1 = ?');
+    params.push(AddLine1);
+  }
+  if (AddLine2) {
+    updates.push('AddLine2 = ?');
+    params.push(AddLine2);
+  }
+
+  params.push(CustAddID);
+
+  const query = `UPDATE CustAddress SET ${updates.join(', ')} WHERE CustAddID = ?`;
+
+  db.run(query, params, function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to update address', details: err.message });
+    }
+
+    if (this.changes === 0) {
+        return res.status(404).json({
+            error: 'No rows updated. Address not found or no new data provided.'
+        });
+    }
+    
+
+    res.status(200).json({ message: 'Address updated' });
+  });
+};
+
+export const DeleteCustomerAddress = (req, res) => {
+  const { CustAddID } = req.params;
+
+  const query = 'DELETE FROM CustAddress WHERE CustAddID = ?';
+
+  db.run(query, [CustAddID], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to delete address', details: err.message });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Address not found' });
+    }
+
+    res.status(200).json({ message: 'Address deleted' });
+  });
+};
+
+  
+  //quotations
+ export const CreateQuotation = (req, res) => {
+    const { CustomerAddID, Area, QuotationPrice } = req.body;
+
+    if (!CustomerAddID || !Area || !QuotationPrice) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const query = 'INSERT INTO Quotation(CustAddID, Area, QuotationPrice) VALUES (?, ?, ?)';
+
+    db.run(query, [CustomerAddID, Area, QuotationPrice], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to create quotation', details: err.message });
+        }
+        res.status(201).json({ message: 'Quotation created successfully', QuotationID: this.lastID });
+    });
+};
+
+
+export const GetQuotation = (req, res) => {
+    const { QuotationID } = req.params;
+
+    const query = 'SELECT * FROM Quotation WHERE QuotationID = ?';
+
+    db.get(query, [QuotationID], (err, quotation) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to fetch quotation', details: err.message });
+        }
+
+        if (!quotation) {
+            return res.status(404).json({ error: 'Quotation not found' });
+        }
+
+        res.status(200).json(quotation);
+    });
+};
+
+export const DeleteQuotation = (req, res) => {
+    const { QuotationChemsID } = req.params;
+
+    const query = 'DELETE FROM Quotation WHERE QuotationID = ?';
+
+    db.run(query, [QuotationChemsID], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to delete quotation', details: err.message });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Quotation not found' });
+        }
+
+        res.status(200).json({ message: 'Quotation deleted successfully' });
+    });
+};
+
+export const UpdateQuotation = (req, res) => {
+    const { QuotationChemsID } = req.params;
+    const { CustomerAddressID, Area, QuotationPrice } = req.body;
+
+    if (!CustomerAddressID && !Area && !QuotationPrice) {
+        return res.status(400).json({ error: 'At least one field must be provided to update' });
+    }
+
+    const fields = [];
+    const values = [];
+
+    if (CustomerAddID) {
+        fields.push('CustomerAddID = ?');
+        values.push(CustomerAddID);
+    }
+    if (Area) {
+        fields.push('Area = ?');
+        values.push(Area);
+    }
+    if (QuotationPrice) {
+        fields.push('QuotationPrice = ?');
+        values.push(QuotationPrice);
+    }
+    const query = `UPDATE Quotation SET ${fields.join(', ')} WHERE QuotationID = ?`;
+    values.push(QuotationChemsID);
+
+    db.run(query, values, function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to update quotation', details: err.message });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Quotation not found' });
+        }
+
+        res.status(200).json({ message: 'Quotation updated successfully' });
+    });
+};
+
+
+
+  export const LogQuoteChems = (req, res) => {
+    console.log('Request Body:', req.body); 
+
+    const {QuotationID,QChemName,QChemQty,QChemUnit} = req.body;
+    if (!QuotationID||!QChemName||!QChemQty||!QChemUnit) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+        const query = 'INSERT INTO QuotationChems(QuotationID,QChemName,QChemQty,QChemUnit) VALUES (?,?,?,?)';
+    
+    db.run(query, [QuotationID,QChemName,QChemQty,QChemUnit], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to create QuoteChemLog', details: err.message });
+      }
+      res.status(201).json({ message: 'ChemLog', QuotationChems: this.lastID });
+    });
+  };
+
+
+  export const GetQuoteChemLog= (req, res) => {
+  const {QuotationID} = req.params; // Extract srID from the request parameters
+    const query = `
+      SELECT 
+        QuotationID,QChemName,QChemQty,QChemUnit
+      FROM 
+        QuotationChems
+      WHERE 
+        QuotationID =?
+    `;
+  
+    db.all(query, [QuotationChems], (err, rows) => {
+      if (err) {
+        console.error('Error fetching Qchemlog:', err.message);
+        return res.status(500).json({
+          error: 'Failed to fetch  QchemLog',
+          details: err.message,
+        });
+      }
+
+      res.json(rows);
+    });
+  };
+  
+
+  
+  export const DeleteQChemLog = (req, res) => {
+    const {QuotationChemsID} = req.params;
+      
+    if (!QuotationChemsID) {
+        return res.status(400).json({ error: 'QuotationChems is required' });
+    }
+  
+    const query = 'DELETE FROM QuotationChems WHERE QuotationChemsID = ?';
+  
+    db.run(query, [QuotationChemsID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete ChemLog', details: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'ChemLog not found' });
+        }
+        res.status(200).json({ message: 'ChemLog deleted successfully' });
+    });
+  };
+
+  export const UpdateQChemLog= (req, res) => {
+    const {QuotationChemsID} = req.params; // Get the EmployeeID from the route parameter
+    const {QuotationID,QChemName,QChemQty,QChemUnit} = req.body; // Get updated fields from the request body
+    
+    if (!QuotationChemsID) {
+        return res.status(400).json({ error: 'SRChemUsageID required' });
+    }
+    if (!QuotationID && !QChemName &&!QChemQty &&!QChemUnit) {
+        return res.status(400).json({ error: 'At least one field to update is required' });
+    }
+    const fieldsToUpdate = [];
+    const values = [];
+  
+    if (QuotationID) {
+        fieldsToUpdate.push('QuotationID = ?');
+        values.push(QuotationID);
+    }
+    if (QChemName) {
+        fieldsToUpdate.push('QChemName = ?');
+        values.push(QChemName);
+    }
+    if (QChemQty) {
+        fieldsToUpdate.push('QChemQty = ?');
+        values.push(QChemUnit);
+    }
+    if (QChemUnit) {
+        fieldsToUpdate.push('QChemUnit = ?');
+        values.push(QChemUnit);
+    }
+
+    const query = `UPDATE QuotationChems SET ${fieldsToUpdate.join(', ')} WHERE QuotationChemsID = ?`;
+    values.push(QuotationChemsID);
+  
+    db.run(query, values, function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to update Quotationchems', details: err.message });
+        }
+  
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'QuotationChemsID not found' });
+        }
+
+        res.status(200).json({ message: 'Qchems updated successfully' });
+    });
+  };
+  //tech crud
+  export const createTechLog = (req, res) => {
+    const { srID, TechName } = req.body;
+
+    if (!srID|| !TechName) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const query = 'INSERT INTO TechniciansPresent (srID, TechName) VALUES (?, ?)';
+
+    db.run(query, [srID, TechName], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to create technician', details: err.message });
+        }
+        res.status(201).json({ message: 'Technician created', TechLogID: this.lastID });
+    });
+};
+
+export const getTechLog = (req, res) => {
+    const { TechLogID } = req.params;
+
+    const query = 'SELECT * FROM TechniciansPresent WHERE TechLogID = ?';
+
+    db.get(query, [TechLogID], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to retrieve technician', details: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: 'Technician not found' });
+        }
+        res.status(200).json(row);
+    });
+};
+
+export const updateTechLog = (req, res) => {
+    const { TechLogID } = req.params;
+    const {TechName} = req.body;
+
+    if (!TechName) {
+        return res.status(400).json({ error: 'No fields provided to update' });
+    }
+
+    const query = 'UPDATE TechniciansPresent SET TechName = ? WHERE TechLogID = ?';
+
+    db.run(query, [TechName, TechLogID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to update technicianlog', details: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'TechnicianLog not found' });
+        }
+        res.status(200).json({ message: 'TechnicianLog updated' });
+    });
+};
+
+export const deleteTechLog = (req, res) => {
+    const { TechLogID } = req.params;
+
+    const query = 'DELETE FROM TechniciansPresent WHERE TechLogID = ?';
+
+    db.run(query, [TechLogID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete technician', details: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Technician not found' });
+        }
+        res.status(200).json({ message: 'TechLog deleted' });
+    });
+};

@@ -227,7 +227,7 @@ const CreateQuotation = () => {
                   {/* Use navigate function from react-router-dom */}
                   {/* Add a cancel handler function */}
                   &nbsp; {/* Add space between buttons */}
-                  <button type='button' onClick={() => navigate('/dashboard')}>Cancel</button> 
+                  <button type='button' onClick={() => navigate('/Dashboard')}>Cancel</button> 
               </div>
 
           </form>

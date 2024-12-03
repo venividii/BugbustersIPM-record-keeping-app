@@ -1,6 +1,6 @@
 import React from 'react';
 import './Dashboard.css'; // Ensure this CSS file is imported
-import CustomerList from './CustomerList'; // Importing CustomerList component
+import CustomerList from '../CustomerList/CustomerList'; // Importing CustomerList component
 import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const Dashboard = ({ user, setUser }) => {

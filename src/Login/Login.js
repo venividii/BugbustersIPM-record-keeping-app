@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Register from './Register'; 
-import './App.css'; 
+import '../App.css'; 
+//import Register from '../Register'; 
+
 
 const Login = ({ setUser, users }) => { // Accept users as a prop
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isRegistering, setIsRegistering] = useState(false); 
+  //  const [isRegistering, setIsRegistering] = useState(false); 
 
     const handleLoginSubmit = (e) => {
         e.preventDefault();
@@ -24,9 +25,7 @@ const Login = ({ setUser, users }) => { // Accept users as a prop
 
     return (
         <div className="login-container">
-            {isRegistering ? (
-                <Register setIsRegistering={setIsRegistering} /> 
-            ) : (
+            { (
                 <>
                     <h2>Login</h2>
                     <form onSubmit={handleLoginSubmit}>
@@ -52,10 +51,7 @@ const Login = ({ setUser, users }) => { // Accept users as a prop
                         </div>
                         <button type="submit">Login</button>
                     </form>
-                    <p>
-                        Don't have an account?{' '}
-                        <button onClick={() => setIsRegistering(true)}>Create Account</button>
-                    </p>
+                   
                 </>
             )}
         </div>
