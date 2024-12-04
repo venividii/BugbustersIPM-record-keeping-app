@@ -113,7 +113,7 @@ const AdminDashboard = ({user,setUser}) => {
         <div className="admin-dashboard-container">
             <h2>Admin Dashboard</h2>
             <h4>Welcome, {firstName}</h4> {/* Display admin's name */}
-            <CustomerList user={user} />
+
             
             <h3>Create Account</h3>
             <form onSubmit={handleCreateTech}>
