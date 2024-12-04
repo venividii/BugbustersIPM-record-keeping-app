@@ -1,9 +1,11 @@
 import express from 'express';
-import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee} from '../controllers/EmployeeController.js';
-import { CreateCustomerProfile, deleteCustomer, updateCustomer,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,} from '../controllers/CustomerController.js';
+
+import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee,Login} from '../controllers/EmployeeController.js';
+import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation} from '../controllers/CustomerController.js';
 import { CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,GetChemLogbyID,DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog} from '../controllers/SRController.js';
 //,getTechLog,updateTechLog,deleteTechLog}
 const router = express.Router();
+
 
 router.post('/employee', createEmployeeAccount);
 router.get('/employee', getAllEmployees); 
@@ -11,10 +13,13 @@ router.delete('/employee/:EmployeeID', deleteEmployee);
 router.get('/employee/:id', getEmployeeById); 
 router.put('/employee/:EmployeeID', updateEmployee);
 
+router.post('/login', Login);
+
 router.post('/customer',CreateCustomerProfile);
+router.get('/customer', getAllCustomers);
 router.delete('/customer/:CustomerID', deleteCustomer);
-router.get('/customer/:id', GetCustomerById); 
-router.put('/customer/:customerID', updateCustomer);
+router.get('/customer/:CustomerID',GetCustomerById); 
+router.put('/customer/:CustomerID', updateCustomer);
 
 router.post('/customer/address',CreateCustomerAddress);
 router.delete('/customer/address/:CustAddID', DeleteCustomerAddress);

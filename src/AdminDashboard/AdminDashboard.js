@@ -1,117 +1,172 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './AdminDash.css'; // Import the CSS file
 import CustomerList from '../CustomerList/CustomerList'; // Importing CustomerList component
 
-const AdminDashboard = ({ setUser, adminName }) => {
-    const [technicians, setTechnicians] = useState([
-        { firstName: 'Tech', lastName: 'One', phoneNumber: '1234567890', username: 'tech1', role: 'technician', password: 'password1' },
-        { firstName: 'Tech', lastName: 'Two', phoneNumber: '9876543210', username: 'tech2', role: 'technician', password: 'password2' },
-    ]);
-
+const AdminDashboard = ({user,setUser}) => {
+    console.log('AdminDashboard user:', user); // Ensure user is passed correctly
+    const [technicians, setTechnicians] = useState([]); // Declare state for technicians
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        username: '',
-        role: 'technician', // Default role as technician
-        password: '',
+        FirstName: '',
+        LastName: '',
+        PhoneNumber: '',
+        Username: '',
+        Role: 'technician', // Default Role as technician
+        Password: '',
     });
+
+    // Fetch technicians data when the component mounts
+    useEffect(() => {
+        const fetchTechnicians = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/employee');
+                setTechnicians(response.data); // Update technicians state with the response data
+            } catch (error) {
+                console.error('Error fetching technicians:', error);
+            }
+        };
+        fetchTechnicians();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleCreateTech = (e) => {
+    const handleCreateTech = async (e) => {
         e.preventDefault();
-        const { firstName, lastName, phoneNumber, username, role, password } = formData;
+    
+        // Destructure formData
+        const { FirstName, LastName, PhoneNumber, Username, Role, Password } = formData;
+        console.log('Sending formData to backend:', formData);
 
-        if (firstName && lastName && phoneNumber && username && role && password) {
-            setTechnicians([...technicians, { ...formData }]);
-            setFormData({
-                firstName: '',
-                lastName: '',
-                phoneNumber: '',
-                username: '',
-                role: 'technician', // Reset to default role
-                password: '',
-            });
-            alert(`Technician ${username} created!`);
+        // Validate all fields are filled
+        if (FirstName && LastName && PhoneNumber && Username && Role && Password) {
+            try {
+                // Log form data for debugging
+                console.log('Sending formData to backend:', formData);
+    
+                // Send form data to the backend to create a technician
+                const response = await axios.post('http://localhost:3001/api/employee', formData);
+    
+                // Extract the new technician data from the backend response
+                const newTechnician = response.data;
+    
+                // Update the local technicians state with the new technician
+                setTechnicians([...technicians, {
+                    FirstName: newTechnician.FirstName,
+                    LastName: newTechnician.LastName,
+                    PhoneNumber: newTechnician.PhoneNumber,
+                    Username: newTechnician.Username,
+                    Role: newTechnician.Role,
+                    Password: '********', // Mask the password in UI (for security)
+                }]);
+    
+                // Reset form fields
+                setFormData({
+                    FirstName: '',
+                    LastName: '',
+                    PhoneNumber: '',
+                    Username: '',
+                    Role: 'technician', // Default value for role
+                    Password: '',
+                });
+    
+                // Notify the admin
+                alert(`Technician ${newTechnician.Username} created successfully!`);
+            } catch (error) {
+                console.error('Error creating technician:', error);
+                alert('Failed to create technician. Please try again.');
+            }
         } else {
             alert("Please fill in all fields.");
         }
     };
-
-    const handleDeleteTech = (username) => {
-        if (window.confirm(`Are you sure you want to delete technician ${username}?`)) {
-            setTechnicians(technicians.filter(tech => tech.username !== username));
-            alert(`Technician ${username} deleted!`);
+    const handleDeleteTech = async (username) => {
+        // Find the technician's EmployeeID based on the username
+        const techToDelete = technicians.find(tech => tech.Username === username);
+    
+        if (techToDelete && window.confirm(`Are you sure you want to delete technician ${username}?`)) {
+            try {
+                // Send DELETE request to the backend with EmployeeID
+                await axios.delete(`http://localhost:3001/api/employee/${techToDelete.EmployeeID}`);
+                
+                // Update the local technicians state by filtering out the deleted technician
+                setTechnicians(technicians.filter(tech => tech.Username !== username));
+                alert(`Technician ${username} deleted!`);
+            } catch (error) {
+                console.error('Error deleting technician:', error);
+                alert('Failed to delete technician. Please try again.');
+            }
         }
     };
+    
 
     const handleLogout = () => {
         setUser(null);
         alert('You have logged out.');
     };
+    const {firstName } = user; 
 
+ 
     return (
         <div className="admin-dashboard-container">
             <h2>Admin Dashboard</h2>
-            <h4>Welcome, {adminName}</h4> {/* Display admin's name */}
+            <h4>Welcome, {firstName}</h4> {/* Display admin's name */}
+            <CustomerList user={user} />
             
-
-            <h3>Create Technician Account</h3>
+            <h3>Create Account</h3>
             <form onSubmit={handleCreateTech}>
                 <div className="form-group">
-                    <label htmlFor="firstName">First Name:</label>
+                    <label htmlFor="FirstName">First Name:</label>
                     <input
                         type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
+                        id="FirstName"
+                        name="FirstName"
+                        value={formData.FirstName}
                         onChange={handleInputChange}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="lastName">Last Name:</label>
+                    <label htmlFor="LastName">Last Name:</label>
                     <input
                         type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
+                        id="LastName"
+                        name="LastName"
+                        value={formData.LastName}
                         onChange={handleInputChange}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phoneNumber">Phone Number:</label>
+                    <label htmlFor="PhoneNumber">Phone Number:</label>
                     <input
                         type="text"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
+                        id="PhoneNumber"
+                        name="PhoneNumber"
+                        value={formData.PhoneNumber}
                         onChange={handleInputChange}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="username">Username:</label>
+                    <label htmlFor="Username">Username:</label>
                     <input
                         type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
+                        id="Username"
+                        name="Username"
+                        value={formData.Username}
                         onChange={handleInputChange}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="role">Role:</label>
+                    <label htmlFor="Role">Role:</label>
                     <select
-                        id="role"
-                        name="role"
-                        value={formData.role}
+                        id="Role"
+                        name="Role"
+                        value={formData.Role}
                         onChange={handleInputChange}
                         required
                     >
@@ -120,17 +175,17 @@ const AdminDashboard = ({ setUser, adminName }) => {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password:</label>
+                    <label htmlFor="Password">Password:</label>
                     <input
                         type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
+                        id="Password"
+                        name="Password"
+                        value={formData.Password}
                         onChange={handleInputChange}
                         required
                     />
                 </div>
-                <button className="create-button" type="submit">Create Technician</button>
+                <button className="create-button" type="submit">Create Employee</button>
             </form>
 
             <h3>Existing Technicians</h3>
@@ -148,13 +203,15 @@ const AdminDashboard = ({ setUser, adminName }) => {
                 <tbody>
                     {technicians.map((tech, index) => (
                         <tr key={index}>
-                            <td>{tech.firstName}</td>
-                            <td>{tech.lastName}</td>
-                            <td>{tech.phoneNumber}</td>
-                            <td>{tech.username}</td>
-                            <td>{tech.role}</td>
+                            <td>{tech.FirstName}</td>
+                            <td>{tech.LastName}</td>
+                            <td>{tech.PhoneNumber}</td>
+                            <td>{tech.Username}</td>
+                            <td>{tech.Role}</td>
                             <td>
-                                <button className="delete-button" onClick={() => handleDeleteTech(tech.username)}>Delete</button>
+                                <button className="delete-button" onClick={() => handleDeleteTech(tech.Username)}>
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -162,9 +219,9 @@ const AdminDashboard = ({ setUser, adminName }) => {
             </table>
 
             {/* Include Customer List for Admin */}
-            <h3>Customer List</h3>
-            <CustomerList />
-            
+    
+            <CustomerList user={user}/>
+
             <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
     );

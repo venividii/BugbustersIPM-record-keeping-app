@@ -3,14 +3,21 @@ import express from 'express';
 import dotenv from 'dotenv';
 import dataRoutes from './routes/dataroutes.js';
 
+import cors from 'cors';
+
+
 // Load environment variables
+
 dotenv.config();
 
 const app = express();
+app.use(cors());
+
 const PORT = process.env.PORT;
 
 // Routes
 app.use(express.json());
+app.use(cors());
 app.use('/api', dataRoutes); // Mount all routes under '/api'
 
 app.get('/', (_req, res) => {

@@ -1,59 +1,66 @@
 import React, { useState } from 'react';
 import '../App.css'; 
-//import Register from '../Register'; 
+import axios from 'axios';
 
+const Login = ({ setUser }) => { // Accept setUser as a prop
+    const [username, setUsername] = useState(''); // Declare username state
+    const [password, setPassword] = useState(''); // Declare password state
 
-const Login = ({ setUser, users }) => { // Accept users as a prop
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-  //  const [isRegistering, setIsRegistering] = useState(false); 
-
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        const user = users.find(user => user.username === username && user.password === password);
-        
-        if (user) {
-            alert(`Login successful! Role: ${user.role}`);
-            setUser(user); // Set the logged-in user in the parent component
-        } else {
-            alert('Invalid username or password');
+
+        try {
+            const response = await axios.post('http://localhost:3001/api/login', {
+              Username: username,
+              Password: password,
+            });
+
+            // Handle successful login
+            alert(response.data.message);
+            const userData = ({ username: response.data.Username, role: response.data.Role, firstName:response.data.FirstName,employeeid: response.data.EmployeeID });
+            console.log('User data being set:', userData); 
+            setUser(userData);
+
+            // Clear input fields after successful login
+            setUsername('');
+            setPassword('');
+        } catch (error) {
+            // Handle errors
+            if (error.response && error.response.data.message) {
+                alert(error.response.data.message); // Backend error
+            } else {
+                console.error('Login error:', error);
+                alert('An unexpected error occurred. Please try again.'); // Fallback error
+            }
         }
-        
-        setUsername('');
-        setPassword('');
     };
 
     return (
         <div className="login-container">
-            { (
-                <>
-                    <h2>Login</h2>
-                    <form onSubmit={handleLoginSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="username">Username:</label>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="password">Password:</label>
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button type="submit">Login</button>
-                    </form>
-                   
-                </>
-            )}
+            <h2>Login</h2>
+            <form onSubmit={handleLoginSubmit}>
+                <div className="form-group">
+                    <label htmlFor="username">Username:</label>
+                    <input
+                        type="text"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit">Login</button>
+            </form>
         </div>
     );
 };

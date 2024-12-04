@@ -1,5 +1,7 @@
 import sqlite3 from 'sqlite3';
 import db from '../database/db.js';  
+import bcrypt from 'bcryptjs'
+
 
 sqlite3.verbose();
 import dotenv from 'dotenv';
@@ -7,21 +9,43 @@ dotenv.config();
 
 //Create an employee function
 export const createEmployeeAccount = (req, res) => {
-    console.log('Request Body:', req.body); 
+  console.log('Request Body:', req.body); 
 
-    const {FirstName,LastName,PhoneNumber,Username,Role,Password } = req.body;
-    if (!FirstName||!LastName|| !Username || !Password ||!Role||!PhoneNumber) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-    const query = 'INSERT INTO Employee(FirstName,LastName,PhoneNumber,Username,Role,Password) VALUES (?, ?, ?, ?, ?, ?)';
-    
-    db.run(query, [FirstName,LastName,PhoneNumber,Username,Role,Password], function (err) {
+  const { FirstName, LastName, PhoneNumber, Username, Role, Password } = req.body;
+
+  // Validate that all fields are providedb
+  if (!FirstName || !LastName || !Username || !Password || !Role || !PhoneNumber) {
+      return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  // Hash the password before storing it
+  bcrypt.hash(Password, 10, (err, hashedPassword) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to create Employee', details: err.message });
+          return res.status(500).json({ error: 'Error hashing password', details: err.message });
       }
-      res.status(201).json({ message: 'Employee created', Employeeid: this.lastID });
-    });
-  };
+
+      const query = 'INSERT INTO Employee(FirstName, LastName, PhoneNumber, Username, Role, Password) VALUES (?, ?, ?, ?, ?, ?)';
+
+      // Insert employee data into the database
+      db.run(query, [FirstName, LastName, PhoneNumber, Username, Role, hashedPassword], function (err) {
+          if (err) {
+              return res.status(500).json({ error: 'Failed to create Employee', details: err.message });
+          }
+
+          // Send response with the newly created employee data
+          res.status(201).json({
+              message: 'Employee created',
+              EmployeeID: this.lastID, // Return the EmployeeID generated in the database
+              FirstName,
+              LastName,
+              PhoneNumber,
+              Username,
+              Role
+          });
+      });
+  });
+};
+
 //Retrieve all employees function
 export const getAllEmployees= (req, res) => {
   const query = `
@@ -165,5 +189,45 @@ export const updateEmployee = (req, res) => {
   });
 };
 
+export const Login = async (req, res) => {
+  const { Username, Password } = req.body;
+ 
 
+  try {
+    // Query to find the employee by username
+    const query = 'SELECT Role, Username, Password,FirstName,EmployeeID FROM Employee WHERE Username = ?'; 
+    db.get(query, [Username], async (err,row) => {
+    if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+
+      if (!row) {
+        console.error('User not found for username:', Username);
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log('Database row:', row); // Log the fetched row for debugging
+
+
+      const isPasswordValid = await bcrypt.compare(Password, row.Password);
+      if (!isPasswordValid) {
+        console.error('Invalid password for username:', Username);
+        return res.status(401).json({ message: 'Invalid Username or password' });
+      }
+      // Return success message and user data
+      return res.status(200).json({
+        message: 'Login successful',
+        Username: row.Username,
+        Role: row.Role, 
+        FirstName: row.FirstName,
+        EmployeeID: row.EmployeeID
+      });
+      
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 

@@ -1,36 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './CustomerList.css'; // Importing CSS for styling
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons
 
-const CustomerList = () => {
-    const [customers, setCustomers] = useState([
-        { name: 'Theodore Roosevelt', place: 'Laguindingan', treatment: 'GPC' },
-        { name: 'Sigma', place: 'Villanueva', treatment: 'Fogging' },
-        { name: 'Adolf Hitler', place: 'Puerto', treatment: 'Termite Control' },
-    ]);
-    
+const CustomerList = ({ user }) => {
+    const [customers, setCustomers] = useState([]);
     const [newCustomer, setNewCustomer] = useState({
-        name: '',
-        place: '',
-        treatment: ''
+        CFirstName: '',
+        CLastName: '',
+        CContact: ''
     });
+    const [editCustomer, setEditCustomer] = useState(null); // To handle editing customers
+
+    // Fetch customer data when the component mounts
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/customer');
+                setCustomers(response.data);
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            }
+        };
+        fetchCustomers();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewCustomer({ ...newCustomer, [name]: value });
     };
 
-    const handleAddCustomer = () => {
-        if (newCustomer.name && newCustomer.place && newCustomer.treatment) {
-            setCustomers([...customers, newCustomer]);
-            setNewCustomer({ name: '', place: '', treatment: '' }); // Reset input fields
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditCustomer({ ...editCustomer, [name]: value });
+    };
+
+    const { employeeid } = user;
+
+    const handleAddCustomer = async () => {
+        if (newCustomer.CFirstName && newCustomer.CLastName && newCustomer.CContact) {
+            try {
+                const response = await axios.post('http://localhost:3001/api/customer', {
+                    CFirstName: newCustomer.CFirstName,
+                    CLastName: newCustomer.CLastName,
+                    CContact: newCustomer.CContact,
+                    CreatedBy: employeeid, // Add the logged-in user's EmployeeID
+                });
+
+                setCustomers([...customers, response.data]);
+                setNewCustomer({ CFirstName: '', CLastName: '', CContact: '' }); // Reset input fields
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                alert('Error adding customer');
+            }
         } else {
-            alert("Please fill in all fields.");
+            alert('Please fill in all fields.');
         }
     };
 
-    const handleRemoveCustomer = (index) => {
-        const updatedCustomers = customers.filter((_, i) => i !== index);
-        setCustomers(updatedCustomers);
+    const handleRemoveCustomer = async (CustomerID) => {
+        try {
+            await axios.delete(`http://localhost:3001/api/customer/${CustomerID}`);
+            const updatedCustomers = customers.filter((customer) => customer.CustomerID !== CustomerID);
+            setCustomers(updatedCustomers);
+        } catch (error) {
+            console.error('Error removing customer:', error);
+            alert('Error removing customer');
+        }
+    };
+
+    const handleEditCustomer = (customer) => {
+        setEditCustomer(customer); // Set the customer to be edited
+    };
+
+    const handleUpdateCustomer = async () => {
+        if (editCustomer.CFirstName && editCustomer.CLastName && editCustomer.CContact) {
+            try {
+                const response = await axios.put(`http://localhost:3001/api/customer/${editCustomer.CustomerID}`, {
+                    CFirstName: editCustomer.CFirstName,
+                    CLastName: editCustomer.CLastName,
+                    CContact: editCustomer.CContact
+                });
+
+                setCustomers(customers.map((customer) =>
+                    customer.CustomerID === editCustomer.CustomerID ? response.data : customer
+                ));
+                setEditCustomer(null); // Reset edit form after update
+            } catch (error) {
+                console.error('Error updating customer:', error);
+                alert('Error updating customer');
+                
+            }
+        } else {
+            alert('Please fill in all fields.');
+        }
     };
 
     return (
@@ -39,47 +102,84 @@ const CustomerList = () => {
             <table className="customer-table">
                 <thead>
                     <tr>
-                        <th>Customer Name</th>
-                        <th>Place of Service</th>
-                        <th>Treatment Provided</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Contact Number</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {customers.map((customer, index) => (
-                        <tr key={index}>
-                            <td>{customer.name}</td>
-                            <td>{customer.place}</td>
-                            <td>{customer.treatment}</td>
+                    {customers.map((customer) => (
+                        <tr key={customer.CustomerID}>
+                            <td>{customer.CFirstName}</td>
+                            <td>{customer.CLastName}</td>
+                            <td>{customer.CContact}</td>
                             <td>
-                                <button onClick={() => handleRemoveCustomer(index)}>Remove</button>
+                                <div className="action-icons">
+                                    <FaEdit
+                                        onClick={() => handleEditCustomer(customer)}
+                                        className="action-icon edit-icon"
+                                    />
+                                    <FaTrash
+                                        onClick={() => handleRemoveCustomer(customer.CustomerID)}
+                                        className="action-icon delete-icon"
+                                    />
+                                </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
+            {editCustomer && (
+                <div className="edit-customer-form">
+                    <h3>Edit Customer</h3>
+                    <input
+                        type="text"
+                        name="CFirstName"
+                        placeholder="First Name"
+                        value={editCustomer.CFirstName}
+                        onChange={handleEditInputChange}
+                    />
+                    <input
+                        type="text"
+                        name="CLastName"
+                        placeholder="Last Name"
+                        value={editCustomer.CLastName}
+                        onChange={handleEditInputChange}
+                    />
+                    <input
+                        type="text"
+                        name="CContact"
+                        placeholder="Contact Number"
+                        value={editCustomer.CContact}
+                        onChange={handleEditInputChange}
+                    />
+                    <button onClick={handleUpdateCustomer}>Update Customer</button>
+                </div>
+            )}
+
             <h3>Add New Customer</h3>
             <div className="add-customer-form">
                 <input
                     type="text"
-                    name="name"
-                    placeholder="Customer Name"
-                    value={newCustomer.name}
+                    name="CFirstName"
+                    placeholder="First Name"
+                    value={newCustomer.CFirstName}
                     onChange={handleInputChange}
                 />
                 <input
                     type="text"
-                    name="place"
-                    placeholder="Place of Service"
-                    value={newCustomer.place}
+                    name="CLastName"
+                    placeholder="Last Name"
+                    value={newCustomer.CLastName}
                     onChange={handleInputChange}
                 />
                 <input
                     type="text"
-                    name="treatment"
-                    placeholder="Treatment Provided"
-                    value={newCustomer.treatment}
+                    name="CContact"
+                    placeholder="Contact Number"
+                    value={newCustomer.CContact}
                     onChange={handleInputChange}
                 />
                 <button onClick={handleAddCustomer}>Add Customer</button>

@@ -1,6 +1,8 @@
 import sqlite3 from 'sqlite3';
 import dotenv from 'dotenv';
 import { resolve } from 'path';
+import { Sequelize } from 'sequelize';
+
 dotenv.config();
 sqlite3.verbose();
 
