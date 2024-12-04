@@ -28,8 +28,8 @@ function App() {
                         }
                     />
                     <Route path="/create-quotation" element={<CreateQuotation />} /> {/* Create Quotation Page */}
-                    <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
                     <Route path="/CustomerList" element={<CustomerList user={user} />} /> {/* Customer List Page */}
+                    <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
                 </Routes>
             </div>
         </Router>

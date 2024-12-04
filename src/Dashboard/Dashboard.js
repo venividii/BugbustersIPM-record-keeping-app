@@ -25,7 +25,7 @@ const Dashboard = ({ user, setUser }) => {
             <div className="main-content">
                 <h2>Customer List</h2>
                 {/* Customer List Section */}
-                <CustomerList />
+                <CustomerList user={user}/>
 
                 {/* Link to Create Quotation Page */}
                 <Link to="/create-quotation">
