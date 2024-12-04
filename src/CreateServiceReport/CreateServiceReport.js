@@ -48,11 +48,10 @@ const CreateServiceReport = () => {
                     <input type="text" id="custAddId" name="custAddId" placeholder="Customer Address ID" required />
                 </div>
 
-                {/* Submit button */}
-                <button type="button">Submit Report</button> {/* No functionality on button */}
-                
-                {/* Cancel button */}
-                <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button> {/* Cancel button */}
+                <div className="button-container">
+                    <button type="button">Submit Report</button>
+                    <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button>
+                </div>
             </form>
         </div>
     );

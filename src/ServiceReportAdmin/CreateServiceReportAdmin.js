@@ -1,14 +1,14 @@
-// src/CreateServiceReportAdmin.js
+// src/CreateServiceReport.js
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import './ServiceReportAdmin.css'; // Importing the CSS file
+import './ServiceReportAdmin.css'; // Importing the new CSS file
 
 const CreateServiceReportAdmin = () => {
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleCancel = () => {
-        navigate('/admin-dashboard'); // Navigate back to the admin dashboard
+        navigate('/admindashboard'); // Navigate back to the admin dashboard
     };
 
     return (
@@ -48,11 +48,10 @@ const CreateServiceReportAdmin = () => {
                     <input type="text" id="custAddId" name="custAddId" placeholder="Customer Address ID" required />
                 </div>
 
-                {/* Submit button */}
-                <button type="button">Submit Report</button> {/* No functionality on button */}
-                
-                {/* Cancel button */}
-                <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button> {/* Cancel button */}
+                <div className="button-container">
+                    <button type="button">Submit Report</button>
+                    <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button>
+                </div>
             </form>
         </div>
     );

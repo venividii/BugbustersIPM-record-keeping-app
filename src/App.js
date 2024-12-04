@@ -8,6 +8,7 @@ import CreateQuotation from './CreateQuotation/CreateQuotation.js'; // Import Cr
 import CustomerList from './CustomerList/CustomerList.js';
 import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js'; // Import CreateServiceReport component
 import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js'; // Import CreateServiceReportAdmin component
+import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js'; // Import EmployeeManagement component
 
 function App() {
     const [user, setUser] = useState(null); // State to hold logged-in user
@@ -34,6 +35,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
                     <Route path="/create-service-report" element={<CreateServiceReport />} /> {/* Create Service Report Page */}
                     <Route path="/create-service-report-admin" element={<CreateServiceReportAdmin />} /> {/* Admin Create Service Report Page */}
+                    <Route path="/employee-management" element={<EmployeeManagement user={user} />} /> {/* Employee Management Page */}
                 </Routes>
             </div>
         </Router>

@@ -67,3 +67,21 @@ p {
 .logout-button:hover {
     background-color: #e53935; /* Darker red on hover for logout button */
 }
+
+.button-spacing {
+    margin-top: 10px; /* Adjust this value as needed */
+}
+
+.button-container {
+    margin-top: 10px; /* Adjust this value as needed */
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Distributes space evenly */
+    margin-top: 10px; /* Optional: adds space above the button container */
+}
+
+.dashboard-button {
+    margin: 0 10px; /* Adds horizontal margin to each button */
+}

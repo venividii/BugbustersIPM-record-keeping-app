@@ -32,15 +32,15 @@ const Dashboard = ({ user, setUser }) => {
                 {/* Customer List Section */}
                 <CustomerList user={user}/>
 
-                {/* Link to Create Service Report Page */}
-                <Link to="/create-service-report">
-                    <button className="dashboard-button">Create Service Report</button>
-                </Link>
+                <div className="button-container">
+    <Link to="/create-service-report">
+        <button className="dashboard-button">Create Service Report</button>
+    </Link>
 
-                {/* Link to Create Quotation Page */}
-                <Link to="/create-quotation">
-                    <button className="dashboard-button">Create Quotation</button>
-                </Link>
+    <Link to="/create-quotation">
+        <button className="dashboard-button">Create Quotation</button>
+    </Link>
+</div>
             </div>
         </div >
     );
