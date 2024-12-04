@@ -100,3 +100,13 @@ h3 {
 .technician-table tr:hover {
     background-color: #f1f1f1; /* Highlight row on hover */
 }
+.header {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Space between heading and logo */
+    align-items: center; /* Center items vertically */
+}
+
+.company-logo {
+    height: 50px; /* Set a height for the logo */
+    width: auto; /* Maintain aspect ratio */
+}

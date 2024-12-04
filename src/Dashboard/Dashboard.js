@@ -1,11 +1,11 @@
 import React from 'react';
-import './Dashboard.css'; // Ensure this CSS file is imported
-import CustomerList from '../CustomerList/CustomerList'; // Importing CustomerList component
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import './Dashboard.css'; 
+import CustomerList from '../CustomerList/CustomerList'; 
+import { Link } from 'react-router-dom'; 
 
 const Dashboard = ({ user, setUser }) => {
     const handleLogout = () => {
-        setUser(null); // Log out by resetting the user state
+        setUser(null); 
         alert("You have logged out.");
     };
 
@@ -13,7 +13,12 @@ const Dashboard = ({ user, setUser }) => {
         <div className="dashboard-container">
             <div className="sidebar">
                 <h3>Logged in as:</h3>
-                <p>{user.username}</p>
+                {/* Check if user is not null before accessing username */}
+                {user ? (
+                    <p>{user.username}</p>
+                ) : (
+                    <p>No user logged in</p> // Fallback message if user is null
+                )}
 
                 {/* Logout button */}
                 <button className="logout-button" onClick={handleLogout}>
@@ -26,6 +31,11 @@ const Dashboard = ({ user, setUser }) => {
                 <h2>Customer List</h2>
                 {/* Customer List Section */}
                 <CustomerList user={user}/>
+
+                {/* Link to Create Service Report Page */}
+                <Link to="/create-service-report">
+                    <button className="dashboard-button">Create Service Report</button>
+                </Link>
 
                 {/* Link to Create Quotation Page */}
                 <Link to="/create-quotation">

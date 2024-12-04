@@ -25,11 +25,13 @@ h2 {
 
 .form-group {
     margin-bottom: 15px;
+    text-align: left; /* Ensure text alignment is left */
 }
 
 label {
-    display: block;
+    display: block; /* Keep labels as block elements */
     margin-bottom: 5px;
+    text-align: left; /* Align label text to the left */
 }
 
 input {
@@ -54,4 +56,15 @@ button {
 
 button:hover {
     background-color: #e55a5a; /* Darker shade of softer red on hover */
+}
+
+.login-page {
+    text-align: center; /* Center-align text and logo */
+}
+
+.login-logo {
+    display: block; /* Center the logo */
+    margin: 20px auto; /* Add margin above and below */
+    width: 80%; /* Adjust width as needed */
+    max-width: 200px; /* Set a max width for responsiveness */
 }
