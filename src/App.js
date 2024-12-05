@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, /*useNavigate */ } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, /*useNavigate */} from 'react-router-dom';
 import './App.css';
 import Login from './Login/Login.js';
 import AdminDashboard from './AdminDashboard/AdminDashboard.js';
@@ -8,7 +8,7 @@ import CreateQuotation from './CreateQuotation/CreateQuotation.js';
 import CustomerList from './CustomerList/CustomerList.js';
 import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js';
 import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js';
-//import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js';
+import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js';
 
 function App() {
     const [user, setUser] = useState(null); // State to hold logged-in user

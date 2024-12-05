@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CustomerList.css'; // Importing CSS for styling
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons
+import { useNavigate } from 'react-router-dom'; // Importing useNavigate for redirection
 
 const CustomerList = ({ user }) => {
+    const navigate = useNavigate(); // Initialize useNavigate
     const [customers, setCustomers] = useState([]);
     const [newCustomer, setNewCustomer] = useState({
         CFirstName: '',
@@ -11,6 +13,13 @@ const CustomerList = ({ user }) => {
         CContact: ''
     });
     const [editCustomer, setEditCustomer] = useState(null); // To handle editing customers
+
+    // If user is null, redirect to login page
+    useEffect(() => {
+        if (!user) {
+            navigate('/login'); // Redirect to login page if user is not authenticated
+        }
+    }, [user, navigate]);
 
     // Fetch customer data when the component mounts
     useEffect(() => {
@@ -35,7 +44,8 @@ const CustomerList = ({ user }) => {
         setEditCustomer({ ...editCustomer, [name]: value });
     };
 
-    const { employeeid } = user;
+    // Safeguard: Check if user is available before accessing employeeid
+    const { employeeid } = user || {}; // If user is null, employeeid will also be undefined
 
     const handleAddCustomer = async () => {
         if (newCustomer.CFirstName && newCustomer.CLastName && newCustomer.CContact) {
@@ -89,12 +99,15 @@ const CustomerList = ({ user }) => {
             } catch (error) {
                 console.error('Error updating customer:', error);
                 alert('Error updating customer');
-                
             }
         } else {
             alert('Please fill in all fields.');
         }
     };
+
+    if (!user) {
+        return <div>Loading...</div>; // Render a loading state until the user is available
+    }
 
     return (
         <div className="customer-list-container">

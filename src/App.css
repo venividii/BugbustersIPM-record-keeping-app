@@ -66,5 +66,5 @@ button:hover {
     display: block; /* Center the logo */
     margin: 20px auto; /* Add margin above and below */
     width: 80%; /* Adjust width as needed */
-    max-width: 200px; /* Set a max width for responsiveness */
+    max-width: 500px; /* Set a max width for responsiveness */
 }
