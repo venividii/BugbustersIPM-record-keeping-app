@@ -1,12 +1,10 @@
 import React from 'react';
 import './Dashboard.css'; 
 import CustomerList from '../CustomerList/CustomerList'; 
-import {useNavigate} from 'react-router-dom';
+
 
 import { Link } from 'react-router-dom'; 
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
-
 const Dashboard = ({ user, setUser }) => {
     const navigate = useNavigate(); // Initialize useNavigate for navigation
 
