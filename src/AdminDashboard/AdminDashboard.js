@@ -4,7 +4,7 @@ import './AdminDash.css'; // Import the CSS file
 import CustomerList from '../CustomerList/CustomerList'; // Importing CustomerList component
 import logo from '../Assets/BugBusters.jpg'; // Adjust the path according to your structure
 import { Link } from 'react-router-dom'; // Import Link for navigation
-const logoUrl = process.env.PUBLIC_URL + '/BugBusters.jpg';
+
 
 const AdminDashboard = ({user,setUser}) => {
     console.log('AdminDashboard user:', user); // Ensure user is passed correctly
@@ -115,7 +115,7 @@ const AdminDashboard = ({user,setUser}) => {
     return (
         <div className="admin-dashboard-container">
             <h2>Admin Dashboard</h2>
-            <img src={logo} alt="Company Logo" className="company-logo" /> {/* Add logo here */}
+            <img src={logo} alt="Company Logo" className="company-logo" /> 
             <h4>Welcome, {firstName}</h4> {/* Display admin's name */}
 
             <Link to="/create-service-report-admin">

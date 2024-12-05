@@ -37,7 +37,13 @@ const Login = ({ setUser }) => {
 
     return (
         <div className="login-page">
-            <img src={logo} alt="Company Logo" className="login-logo" /> {/* Logo outside of container */}
+
+            <img
+             src={logo}
+            alt="Company Logo"
+            className="login-logo"
+             style={{ width: "3200px", height: "auto" }} // Adjust width as needed
+            />
             <div className="login-container">
                 <h2>Login</h2>
                 <form onSubmit={handleLoginSubmit}>
