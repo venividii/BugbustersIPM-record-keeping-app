@@ -10,7 +10,6 @@ const AdminDashboard = ({ user, setUser }) => {
 
     const handleLogout = () => {
         setUser(null);
-        alert('You have logged out.');
     };
 
     return (

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 const Login = ({ setUser }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState(''); // State for error message
     const navigate = useNavigate(); // Initialize useNavigate hook for redirection
 
     const handleLoginSubmit = async (e) => {
@@ -16,7 +17,6 @@ const Login = ({ setUser }) => {
                 Username: username,
                 Password: password,
             });
-            alert(response.data.message);
 
             const userData = {
                 username: response.data.Username,
@@ -29,6 +29,7 @@ const Login = ({ setUser }) => {
             setUser(userData); // Set user state with response data
             setUsername('');
             setPassword('');
+            setErrorMessage(''); // Clear any previous error messages
 
             // Navigate to the appropriate dashboard based on user role
             if (response.data.Role === 'admin') {
@@ -38,10 +39,10 @@ const Login = ({ setUser }) => {
             }
         } catch (error) {
             if (error.response && error.response.data.message) {
-                alert(error.response.data.message);
+                setErrorMessage(error.response.data.message); // Set error message state
             } else {
                 console.error('Login error:', error);
-                alert('An unexpected error occurred. Please try again.');
+                setErrorMessage('An unexpected error occurred. Please try again.');
             }
         }
     };
@@ -51,6 +52,7 @@ const Login = ({ setUser }) => {
             <img src={logo} alt="Company Logo" className="login-logo" /> {/* Logo outside of container */}
             <div className="login-container">
                 <h2>Login</h2>
+                {errorMessage && <div className="error-message">{errorMessage}</div>} {/* Display error message */}
                 <form onSubmit={handleLoginSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Username:</label>

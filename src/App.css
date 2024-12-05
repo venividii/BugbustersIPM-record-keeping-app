@@ -70,3 +70,12 @@ button:hover {
     width: 80%; /* Adjust width as needed */
     max-width: 500px; /* Set a max width for responsiveness */
 }
+
+.error-message {
+    color: red; /* Red text color */
+    background-color: #ffe6e6; /* Light red background */
+    border: 1px solid red; /* Red border */
+    padding: 10px; /* Padding around the text */
+    margin-bottom: 15px; /* Space below the error message */
+    border-radius: 5px; /* Rounded corners */
+}

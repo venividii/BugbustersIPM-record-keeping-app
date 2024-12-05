@@ -11,7 +11,6 @@ const Dashboard = ({ user, setUser }) => {
     const handleLogout = () => {
         setUser(null); 
         navigate('/login'); // Redirect to login page after logout
-        alert("You have logged out.");
     };
 
     console.log('Current user:', user); // Log the current user state
