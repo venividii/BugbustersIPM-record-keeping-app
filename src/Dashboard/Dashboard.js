@@ -2,10 +2,14 @@ import React from 'react';
 import './Dashboard.css'; 
 import CustomerList from '../CustomerList/CustomerList'; 
 import { Link } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
 
 const Dashboard = ({ user, setUser }) => {
+    const navigate = useNavigate();
     const handleLogout = () => {
         setUser(null); 
+        navigate('/login'); // Redirect to login page after logout
         alert("You have logged out.");
     };
 

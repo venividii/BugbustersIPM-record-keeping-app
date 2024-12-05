@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Importing necessary components from react-router-dom
+import { BrowserRouter as Router, Route, Routes, /*useNavigate */ } from 'react-router-dom';
 import './App.css';
-import Login from './Login/Login.js'; 
-import AdminDashboard from './AdminDashboard/AdminDashboard.js'; 
-import Dashboard from './Dashboard/Dashboard.js'; 
-import CreateQuotation from './CreateQuotation/CreateQuotation.js'; // Import CreateQuotation component
+import Login from './Login/Login.js';
+import AdminDashboard from './AdminDashboard/AdminDashboard.js';
+import Dashboard from './Dashboard/Dashboard.js';
+import CreateQuotation from './CreateQuotation/CreateQuotation.js';
 import CustomerList from './CustomerList/CustomerList.js';
-import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js'; // Import CreateServiceReport component
-import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js'; // Import CreateServiceReportAdmin component
+import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js';
+import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js';
+//import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js';
 
 function App() {
     const [user, setUser] = useState(null); // State to hold logged-in user
@@ -17,6 +18,10 @@ function App() {
         <Router>
             <div className="App">
                 <Routes>
+                    {/* Route to login page */}
+                    <Route path="/login" element={<Login setUser={setUser} />} />
+                    
+                    {/* Default route based on user state */}
                     <Route
                         path="/"
                         element={
@@ -29,11 +34,13 @@ function App() {
                             )
                         }
                     />
-                    <Route path="/create-quotation" element={<CreateQuotation />} /> {/* Create Quotation Page */}
-                    <Route path="/customer-list" element={<CustomerList user={user} />} /> {/* Customer List Page */}
+
+                    <Route path="/create-quotation" element={<CreateQuotation user={user} />} />
+                    <Route path="/customer-list" element={<CustomerList user={user} />} />
                     <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
-                    <Route path="/create-service-report" element={<CreateServiceReport />} /> {/* Create Service Report Page */}
-                    <Route path="/create-service-report-admin" element={<CreateServiceReportAdmin />} /> {/* Admin Create Service Report Page */}
+                    <Route path="/create-service-report" element={<CreateServiceReport user={user} />} />
+                    <Route path="/create-service-report-admin" element={<CreateServiceReportAdmin user={user} />} />
+                    <Route path="/employee-management" element={<EmployeeManagement user={user} />} />
                 </Routes>
             </div>
         </Router>
