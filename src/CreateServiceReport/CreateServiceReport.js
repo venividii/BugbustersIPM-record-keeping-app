@@ -4,11 +4,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './CreateServiceReport.css'; // Importing the new CSS file
 
-const CreateServiceReport = () => {
+const CreateServiceReport = ({user}) => {
     const navigate = useNavigate(); // Initialize useNavigate
-
+    
     const handleCancel = () => {
         navigate('/dashboard'); // Navigate back to the dashboard
+
+        console.log('Current user:', user); // Log the current user state
+
+
     };
 
     return (

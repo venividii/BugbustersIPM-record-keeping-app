@@ -1,16 +1,22 @@
 import React from 'react';
 import './Dashboard.css'; 
 import CustomerList from '../CustomerList/CustomerList'; 
+import {useNavigate} from 'react-router-dom';
+
 import { Link } from 'react-router-dom'; 
 
 const Dashboard = ({ user, setUser }) => {
+    const navigate = useNavigate(); // Initialize useNavigate for navigation
+
     const handleLogout = () => {
-        setUser(null); 
-        alert("You have logged out.");
+        setUser(null); // Clear user state
+        navigate('/login'); // Redirect to login page after logout
     };
+    console.log('Current user:', user); // Log the current user state
 
     return (
         <div className="dashboard-container">
+            
             <div className="sidebar">
                 <h3>Logged in as:</h3>
                 {/* Check if user is not null before accessing username */}
@@ -21,14 +27,12 @@ const Dashboard = ({ user, setUser }) => {
                 )}
 
                 {/* Logout button */}
-                <button className="logout-button" onClick={handleLogout}>
-                    Logout
-                </button> 
+                <button className="logout-button" onClick={handleLogout}> Logout </button> 
             </div>
 
             {/* Main content area */}
             <div className="main-content">
-                <h2>Customer List</h2>
+                <h2>Tech Dashboard</h2>
                 {/* Customer List Section */}
                 <CustomerList user={user}/>
 
