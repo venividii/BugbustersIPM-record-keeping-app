@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CustomerList.css'; // Importing CSS for styling
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons
-import { useEmployee } from '../EmployeeContext'; // Importing the context hook
 
-const CustomerList = () => {
-    const { user } = useEmployee(); // Access user from context
+const CustomerList = ({ user }) => {
     const [customers, setCustomers] = useState([]);
     const [newCustomer, setNewCustomer] = useState({
         CFirstName: '',
         CLastName: '',
-        CContact: '',
+        CContact: ''
     });
     const [editCustomer, setEditCustomer] = useState(null); // To handle editing customers
 
@@ -37,6 +35,8 @@ const CustomerList = () => {
         setEditCustomer({ ...editCustomer, [name]: value });
     };
 
+    const { employeeid } = user;
+
     const handleAddCustomer = async () => {
         if (newCustomer.CFirstName && newCustomer.CLastName && newCustomer.CContact) {
             try {
@@ -44,7 +44,7 @@ const CustomerList = () => {
                     CFirstName: newCustomer.CFirstName,
                     CLastName: newCustomer.CLastName,
                     CContact: newCustomer.CContact,
-                    CreatedBy: user.employeeid, // Use EmployeeID from context
+                    CreatedBy: employeeid, // Add the logged-in user's EmployeeID
                 });
 
                 setCustomers([...customers, response.data]);
@@ -79,7 +79,7 @@ const CustomerList = () => {
                 const response = await axios.put(`http://localhost:3001/api/customer/${editCustomer.CustomerID}`, {
                     CFirstName: editCustomer.CFirstName,
                     CLastName: editCustomer.CLastName,
-                    CContact: editCustomer.CContact,
+                    CContact: editCustomer.CContact
                 });
 
                 setCustomers(customers.map((customer) =>
@@ -89,6 +89,7 @@ const CustomerList = () => {
             } catch (error) {
                 console.error('Error updating customer:', error);
                 alert('Error updating customer');
+                
             }
         } else {
             alert('Please fill in all fields.');

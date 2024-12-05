@@ -2,11 +2,8 @@ import React from 'react';
 import './Dashboard.css'; 
 import CustomerList from '../CustomerList/CustomerList'; 
 import { Link } from 'react-router-dom'; 
-import { useEmployee } from '../EmployeeContext'; // Import the context hook
 
-const Dashboard = () => {
-    const { user, setUser } = useEmployee(); // Access user and setUser from context
-
+const Dashboard = ({ user, setUser }) => {
     const handleLogout = () => {
         setUser(null); 
         alert("You have logged out.");
@@ -33,7 +30,7 @@ const Dashboard = () => {
             <div className="main-content">
                 <h2>Customer List</h2>
                 {/* Customer List Section */}
-                <CustomerList /> {/* No need to pass user as prop */}
+                <CustomerList user={user}/>
 
                 {/* Link to Create Service Report Page */}
                 <Link to="/create-service-report">
