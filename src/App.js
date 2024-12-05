@@ -7,7 +7,6 @@ import Dashboard from './Dashboard/Dashboard.js';
 import CreateQuotation from './CreateQuotation/CreateQuotation.js';
 import CustomerList from './CustomerList/CustomerList.js';
 import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js';
-import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js';
 import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js';
 import AddCustomer from './AddCustomer/AddCustomer.js'; // Importing the new AddCustomer component
 
@@ -40,7 +39,7 @@ function App() {
                     <Route path="/customer-list" element={<CustomerList user={user} />} />
                     <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
                     <Route path="/create-service-report" element={<CreateServiceReport user={user} />} />
-                    <Route path="/create-service-report-admin" element={<CreateServiceReportAdmin user={user} />} />
+
                     <Route path="/employee-management" element={<EmployeeManagement user={user} />} />
                     <Route path="/add-customer" element={<AddCustomer user={user} />} /> {/* New route for adding customers */}
                 </Routes>
