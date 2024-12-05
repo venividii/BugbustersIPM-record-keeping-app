@@ -40,7 +40,7 @@ const AdminDashboard = ({ user, setUser }) => {
                 </Link>
 
                 {/* Link to Create Service Report Page */}
-                <Link to="/create-service-report-admin">
+                <Link to="/create-service-report">
                     <button className='create-service-report-button'>Create Service Report</button>
                 </Link>
 
