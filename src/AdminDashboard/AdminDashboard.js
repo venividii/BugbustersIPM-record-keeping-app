@@ -6,7 +6,7 @@ import logo from '../Assets/BugBusters.jpg'; // Adjust the path according to you
 
 const AdminDashboard = ({ user, setUser }) => {
     const { firstName } = user;
-    const [searchQuery, setSearchQuery] = useState(''); // State for search query
+    const [searchTerm, setSearchTerm] = useState(''); // State for search query
 
     const handleLogout = () => {
         setUser(null);
@@ -23,14 +23,14 @@ const AdminDashboard = ({ user, setUser }) => {
                 <input 
                     type="text" 
                     placeholder="Search Customers..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)} // Update state on input change
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)} // Update state on input change
                     className="search-input"
                 />
             </div>
 
             {/* Include Customer List for Admin */}
-            <CustomerList user={user} searchQuery={searchQuery} /> {/* Pass search query to CustomerList */}
+            <CustomerList user={user} searchTerm={searchTerm} /> {/* Pass search query to CustomerList */}
 
             {/* Button Container moved below Customer List */}
             <div className="button-container">

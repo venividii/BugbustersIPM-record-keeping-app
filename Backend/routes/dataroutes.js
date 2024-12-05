@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee,Login} from '../controllers/EmployeeController.js';
-import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation} from '../controllers/CustomerController.js';
+import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,DeleteCustomerAddresses} from '../controllers/CustomerController.js';
 import { CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,GetChemLogbyID,DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog} from '../controllers/SRController.js';
 //,getTechLog,updateTechLog,deleteTechLog}
 const router = express.Router();
@@ -25,6 +25,8 @@ router.post('/customer/address',CreateCustomerAddress);
 router.delete('/customer/address/:CustAddID', DeleteCustomerAddress);
 router.get('/customer/address/:CustAddID', ReadCustomerAddress); 
 router.put('/customer/address/:CustAddID', UpdateCustomerAddress);
+router.delete('/customer/address/all/:CustomerID', DeleteCustomerAddresses);
+
 
 router.post('/customer/address/quote',CreateQuotation);
 router.get('/customer/address/quote/:QuotationID', GetQuotation);

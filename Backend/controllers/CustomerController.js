@@ -166,26 +166,32 @@ export const CreateCustomerProfile = (req, res) => {
 
 //customer address table
 
-  export const CreateCustomerAddress = (req, res) => {
+export const CreateCustomerAddress = (req, res) => {
   const { CustomerID, Province, City, Barangay, AddLine1, AddLine2 } = req.body;
+  console.log('Received address data on backend:', req.body);
 
+  // Check if all required fields are provided
   if (!CustomerID || !Province || !City || !Barangay || !AddLine1) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  // SQL query to insert a new address
   const query = `
     INSERT INTO CustAddress (CustomerID, Province, City, Barangay, AddLine1, AddLine2)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
+  // Execute the query
   db.run(query, [CustomerID, Province, City, Barangay, AddLine1, AddLine2], function (err) {
     if (err) {
+      // If there is an error, return a 500 status with the error message
       return res.status(500).json({ error: 'Failed to create address', details: err.message });
     }
+
+    // Respond with the newly generated CustAddID
     res.status(201).json({ message: 'Address created', CustAddID: this.lastID });
   });
 };
-
 // Read addresses (all or filtered by CustomerProfile)
 export const ReadCustomerAddress = (req, res) => {
   const { CustomerProfile } = req.query;
@@ -557,4 +563,20 @@ export const deleteTechLog = (req, res) => {
         }
         res.status(200).json({ message: 'TechLog deleted' });
     });
+};
+
+export const DeleteCustomerAddresses = (req, res) => {
+  const { CustomerID } = req.params; // Extract CustomerID from request params
+  console.log('Deleting addresses for CustomerID:', CustomerID);
+
+  const query = `
+    DELETE FROM CustAddress WHERE CustomerID = ?
+  `;
+
+  db.run(query, [CustomerID], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to delete addresses', details: err.message });
+    }
+    res.status(200).json({ message: 'Addresses deleted successfully' });
+  });
 };

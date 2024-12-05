@@ -24,6 +24,10 @@ const CreateServiceReport = ({user}) => {
                     <input type="text" id="srid" name="srid" placeholder="SRID" required />
                 </div>
                 <div className="form-group">
+                    <label htmlFor="custAddId">Customer Address ID</label>
+                    <input type="text" id="custAddId" name="custAddId" placeholder="Customer Address ID" required />
+                </div>
+                <div className="form-group">
                     <label htmlFor="customerId">Customer ID</label>
                     <input type="text" id="customerId" name="customerId" placeholder="Customer ID" required />
                 </div>
@@ -47,11 +51,7 @@ const CreateServiceReport = ({user}) => {
                     <label htmlFor="createdBy">Created By</label>
                     <input type="text" id="createdBy" name="createdBy" placeholder="Created By" required />
                 </div>
-                <div className="form-group">
-                    <label htmlFor="custAddId">Customer Address ID</label>
-                    <input type="text" id="custAddId" name="custAddId" placeholder="Customer Address ID" required />
-                </div>
-
+          
                 <div className="button-container">
                     <button type="button">Submit Report</button>
                     <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button>
@@ -60,5 +60,4 @@ const CreateServiceReport = ({user}) => {
         </div>
     );
 };
-
 export default CreateServiceReport;
