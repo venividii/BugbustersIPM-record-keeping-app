@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 import './AdminDash.css'; // Import the CSS file
 import CustomerList from '../CustomerList/CustomerList'; // Importing CustomerList component
@@ -6,6 +6,7 @@ import logo from '../Assets/BugBusters.jpg'; // Adjust the path according to you
 
 const AdminDashboard = ({ user, setUser }) => {
     const { firstName } = user;
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
     const handleLogout = () => {
         setUser(null);
@@ -18,7 +19,21 @@ const AdminDashboard = ({ user, setUser }) => {
             <h2>Admin Dashboard</h2>
             <h4>Welcome, {firstName}</h4> {/* Display admin's name */}
 
-            {/* Button Container */}
+            {/* Search Bar for Customers */}
+            <div className="search-container">
+                <input 
+                    type="text" 
+                    placeholder="Search Customers..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)} // Update state on input change
+                    className="search-input"
+                />
+            </div>
+
+            {/* Include Customer List for Admin */}
+            <CustomerList user={user} searchQuery={searchQuery} /> {/* Pass search query to CustomerList */}
+
+            {/* Button Container moved below Customer List */}
             <div className="button-container">
                 {/* Link to Employee Management Page */}
                 <Link to="/employee-management">
@@ -35,9 +50,6 @@ const AdminDashboard = ({ user, setUser }) => {
                     <button className='add-customer-button'>Add Customer</button>
                 </Link>
             </div>
-
-            {/* Include Customer List for Admin */}
-            <CustomerList user={user}/>
 
             {/* Logout button */}
             <button className="logout-button" onClick={handleLogout}>Logout</button>

@@ -107,6 +107,22 @@ h3 {
 }
 
 .company-logo {
-    height: 50px; /* Set a height for the logo */
+    height: 75px; /* Set a height for the logo */
     width: auto; /* Maintain aspect ratio */
+}
+
+.search-container {
+    margin-bottom: 20px; /* Space below the search bar */
+}
+
+.search-input {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for comfort */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    box-sizing: border-box; /* Include padding and border in total width */
+}
+
+.search-input:focus {
+    border-color: #ff6b6b; /* Softer red border on focus */
 }
