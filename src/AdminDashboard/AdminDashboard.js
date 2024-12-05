@@ -14,19 +14,27 @@ const AdminDashboard = ({ user, setUser }) => {
 
     return (
         <div className="admin-dashboard-container">
-            <h2>Admin Dashboard</h2>
             <img src={logo} alt="Company Logo" className="company-logo" /> 
+            <h2>Admin Dashboard</h2>
             <h4>Welcome, {firstName}</h4> {/* Display admin's name */}
 
-            {/* Link to Employee Management Page */}
-            <Link to="/employee-management">
-                <button className='manage-employees-button'>Manage Employees</button> {/* Button to manage employees */}
-            </Link>
+            {/* Button Container */}
+            <div className="button-container">
+                {/* Link to Employee Management Page */}
+                <Link to="/employee-management">
+                    <button className='manage-employees-button'>Manage Employees</button> {/* Button to manage employees */}
+                </Link>
 
-            {/* Link to Create Service Report Page */}
-            <Link to="/create-service-report-admin">
-                <button className='create-service-report-button'>Create Service Report</button>
-            </Link>
+                {/* Link to Create Service Report Page */}
+                <Link to="/create-service-report-admin">
+                    <button className='create-service-report-button'>Create Service Report</button>
+                </Link>
+
+                {/* Link to Add Customer Page */}
+                <Link to="/add-customer">
+                    <button className='add-customer-button'>Add Customer</button>
+                </Link>
+            </div>
 
             {/* Include Customer List for Admin */}
             <CustomerList user={user}/>

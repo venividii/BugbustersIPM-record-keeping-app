@@ -7,11 +7,6 @@ import { useNavigate } from 'react-router-dom'; // Importing useNavigate for red
 const CustomerList = ({ user }) => {
     const navigate = useNavigate(); // Initialize useNavigate
     const [customers, setCustomers] = useState([]);
-    const [newCustomer, setNewCustomer] = useState({
-        CFirstName: '',
-        CLastName: '',
-        CContact: ''
-    });
     const [editCustomer, setEditCustomer] = useState(null); // To handle editing customers
 
     // If user is null, redirect to login page
@@ -34,40 +29,6 @@ const CustomerList = ({ user }) => {
         fetchCustomers();
     }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewCustomer({ ...newCustomer, [name]: value });
-    };
-
-    const handleEditInputChange = (e) => {
-        const { name, value } = e.target;
-        setEditCustomer({ ...editCustomer, [name]: value });
-    };
-
-    // Safeguard: Check if user is available before accessing employeeid
-    const { employeeid } = user || {}; // If user is null, employeeid will also be undefined
-
-    const handleAddCustomer = async () => {
-        if (newCustomer.CFirstName && newCustomer.CLastName && newCustomer.CContact) {
-            try {
-                const response = await axios.post('http://localhost:3001/api/customer', {
-                    CFirstName: newCustomer.CFirstName,
-                    CLastName: newCustomer.CLastName,
-                    CContact: newCustomer.CContact,
-                    CreatedBy: employeeid, // Add the logged-in user's EmployeeID
-                });
-
-                setCustomers([...customers, response.data]);
-                setNewCustomer({ CFirstName: '', CLastName: '', CContact: '' }); // Reset input fields
-            } catch (error) {
-                console.error('Error adding customer:', error);
-                alert('Error adding customer');
-            }
-        } else {
-            alert('Please fill in all fields.');
-        }
-    };
-
     const handleRemoveCustomer = async (CustomerID) => {
         try {
             await axios.delete(`http://localhost:3001/api/customer/${CustomerID}`);
@@ -89,9 +50,8 @@ const CustomerList = ({ user }) => {
                 const response = await axios.put(`http://localhost:3001/api/customer/${editCustomer.CustomerID}`, {
                     CFirstName: editCustomer.CFirstName,
                     CLastName: editCustomer.CLastName,
-                    CContact: editCustomer.CContact
+                    CContact: editCustomer.CContact,
                 });
-
                 setCustomers(customers.map((customer) =>
                     customer.CustomerID === editCustomer.CustomerID ? response.data : customer
                 ));
@@ -129,14 +89,8 @@ const CustomerList = ({ user }) => {
                             <td>{customer.CContact}</td>
                             <td>
                                 <div className="action-icons">
-                                    <FaEdit
-                                        onClick={() => handleEditCustomer(customer)}
-                                        className="action-icon edit-icon"
-                                    />
-                                    <FaTrash
-                                        onClick={() => handleRemoveCustomer(customer.CustomerID)}
-                                        className="action-icon delete-icon"
-                                    />
+                                    <FaEdit onClick={() => handleEditCustomer(customer)} className="action-icon edit-icon" />
+                                    <FaTrash onClick={() => handleRemoveCustomer(customer.CustomerID)} className="action-icon delete-icon" />
                                 </div>
                             </td>
                         </tr>
@@ -147,56 +101,12 @@ const CustomerList = ({ user }) => {
             {editCustomer && (
                 <div className="edit-customer-form">
                     <h3>Edit Customer</h3>
-                    <input
-                        type="text"
-                        name="CFirstName"
-                        placeholder="First Name"
-                        value={editCustomer.CFirstName}
-                        onChange={handleEditInputChange}
-                    />
-                    <input
-                        type="text"
-                        name="CLastName"
-                        placeholder="Last Name"
-                        value={editCustomer.CLastName}
-                        onChange={handleEditInputChange}
-                    />
-                    <input
-                        type="text"
-                        name="CContact"
-                        placeholder="Contact Number"
-                        value={editCustomer.CContact}
-                        onChange={handleEditInputChange}
-                    />
+                    <input type="text" name="CFirstName" placeholder="First Name" value={editCustomer.CFirstName} onChange={(e) => setEditCustomer({ ...editCustomer, CFirstName: e.target.value })} />
+                    <input type="text" name="CLastName" placeholder="Last Name" value={editCustomer.CLastName} onChange={(e) => setEditCustomer({ ...editCustomer, CLastName: e.target.value })} />
+                    <input type="text" name="CContact" placeholder="Contact Number" value={editCustomer.CContact} onChange={(e) => setEditCustomer({ ...editCustomer, CContact: e.target.value })} />
                     <button onClick={handleUpdateCustomer}>Update Customer</button>
                 </div>
             )}
-
-            <h3>Add New Customer</h3>
-            <div className="add-customer-form">
-                <input
-                    type="text"
-                    name="CFirstName"
-                    placeholder="First Name"
-                    value={newCustomer.CFirstName}
-                    onChange={handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="CLastName"
-                    placeholder="Last Name"
-                    value={newCustomer.CLastName}
-                    onChange={handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="CContact"
-                    placeholder="Contact Number"
-                    value={newCustomer.CContact}
-                    onChange={handleInputChange}
-                />
-                <button onClick={handleAddCustomer}>Add Customer</button>
-            </div>
         </div>
     );
 };

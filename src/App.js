@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, /*useNavigate */} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Login from './Login/Login.js';
 import AdminDashboard from './AdminDashboard/AdminDashboard.js';
@@ -9,6 +9,7 @@ import CustomerList from './CustomerList/CustomerList.js';
 import CreateServiceReport from './CreateServiceReport/CreateServiceReport.js';
 import CreateServiceReportAdmin from './ServiceReportAdmin/CreateServiceReportAdmin.js';
 import EmployeeManagement from './EmployeeManagement/EmployeeManagement.js';
+import AddCustomer from './AddCustomer/AddCustomer.js'; // Importing the new AddCustomer component
 
 function App() {
     const [user, setUser] = useState(null); // State to hold logged-in user
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/create-service-report" element={<CreateServiceReport user={user} />} />
                     <Route path="/create-service-report-admin" element={<CreateServiceReportAdmin user={user} />} />
                     <Route path="/employee-management" element={<EmployeeManagement user={user} />} />
+                    <Route path="/add-customer" element={<AddCustomer user={user} />} /> {/* New route for adding customers */}
                 </Routes>
             </div>
         </Router>

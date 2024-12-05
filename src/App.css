@@ -19,8 +19,9 @@ body
 }
 
 h2 {
-    text-align: center;
+    text-align: left; /* Align text to the left */
     color: #ff6b6b; /* Softer red text for the heading */
+    margin-bottom: 20px; /* Optional: Add some space below the heading */
 }
 
 .form-group {
@@ -46,12 +47,13 @@ input:focus {
 }
 
 button {
-    width: 100%;
-    padding: 10px;
+    width: 100%; /* Ensure button takes full width */
+    padding: 10px; /* Padding for button */
     background-color: #ff6b6b; /* Softer red background for button */
     color: white; /* White text on button */
     border: none;
     border-radius: 5px;
+    box-sizing: border-box; /* Include padding and border in element's total width */
 }
 
 button:hover {

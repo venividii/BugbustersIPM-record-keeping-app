@@ -1,0 +1,51 @@
+/* src/AddCustomer.css */
+
+.add-customer-container {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    max-width: 600px; /* Limit the width of the form */
+    margin: 20px auto; /* Center the form */
+    padding: 20px; /* Add padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: #ffffff; /* White background */
+}
+
+h2 {
+    text-align: center; /* Center align heading */
+    color: #333; /* Darker text color */
+}
+
+input[type="text"] {
+    width: 100%; /* Full width for inputs */
+    padding: 10px; /* Padding inside inputs */
+    margin: 10px 0; /* Vertical margin between inputs */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Increase font size */
+}
+
+button {
+    width: auto; /* Set to auto to fit content */
+    padding: 15px; /* Increase padding for larger buttons */
+    margin-top: 10px; /* Space above button */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #4CAF50; /* Green background for action buttons */
+    color: white; /* White text color */
+    font-size: 16px; /* Increase font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover for action buttons */
+}
+
+.cancel-button {
+    background-color: #f44336; /* Red background for cancel button */
+}
+
+.cancel-button:hover {
+    background-color: #e53935; /* Darker red on hover */
+}
