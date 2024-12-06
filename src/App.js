@@ -34,7 +34,7 @@ function App() {
                             )
                         }
                     />
-
+                     <Route path="/admin-dashboard" element={<AdminDashboard user={user} setUser={setUser} />} />
                     <Route path="/create-quotation" element={<CreateQuotation user={user} />} />
                     <Route path="/customer-list" element={<CustomerList user={user} />} />
                     <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />

@@ -49,11 +49,11 @@ const Dashboard = ({ user, setUser }) => {
                         <button className="dashboard-button">Create Service Report</button>
                     </Link>
 
-                    <Link to="/create-quotation">
-                        <button className="dashboard-button">Create Quotation</button>
-                    </Link>
+                {/*/</div>">
+                    </div></div>     <button className="dashboard-button">Create Quotation</button>
+                    </Link> */}
 
-                    {/* Link to Add New Customer Page */}
+
                     <Link to="/add-customer">
                         <button className="dashboard-button">Add New Customer</button>
                     </Link>

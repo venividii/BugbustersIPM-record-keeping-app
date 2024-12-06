@@ -7,7 +7,7 @@ dotenv.config();
 export const CreateServiceReport = (req, res) => {
     console.log('Request Body:', req.body); 
 
-    const {Date,CustomerID,Treatment,PestNoted,ServiceRemarks,CustAddID,CreatedBy} = req.body;
+    const {date,CustomerID,Treatment,PestNoted,ServiceRemarks,CustAddID,CreatedBy} = req.body;
     if (!Date||!CustomerID||!Treatment||!PestNoted||!ServiceRemarks||!CreatedBy||!CustAddID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }

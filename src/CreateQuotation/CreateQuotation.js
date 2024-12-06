@@ -212,21 +212,13 @@ const CreateQuotation = () => {
                   </>
               )}
 
-              {/* Button Section */}
-              {/* Separate Submit and Cancel buttons */}
-              {/* Adding margin to separate it visually */}
-              {/* Ensure buttons are not stuck to the table */}
-              {/* Adjust styles as needed */}
-              {/* You can also wrap them in a div for better alignment */}
+      
               <div style={{ marginTop: '20px' }}>
                   {/* Submit Button */}
                   <button type='submit'>Submit Quotation</button>
 
-                  {/* Cancel Button */}
-                  {/* Navigate back to dashboard when clicked */}
-                  {/* Use navigate function from react-router-dom */}
-                  {/* Add a cancel handler function */}
-                  &nbsp; {/* Add space between buttons */}
+         
+                  &nbsp; 
                   <button type='button' onClick={() => navigate('/Dashboard')}>Cancel</button> 
               </div>
 
