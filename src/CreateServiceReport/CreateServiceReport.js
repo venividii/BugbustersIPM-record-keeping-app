@@ -61,15 +61,15 @@ const CreateServiceReport = ({user}) => {
                     console.log("Filtered Addresses:", customerAddresses);
     
                     setAddresses(customerAddresses);
-                    setIsAddressDropdownOpen(customerAddresses.length > 0); // Open dropdown only if there are addresses
+                    setIsAddressDropdownOpen(customerAddresses.length > 0); 
                 })
                 .catch((error) => {
                     console.error("Error fetching addresses:", error);
                 });
         } else {
             console.log("No customer selected. Resetting addresses.");
-            setAddresses([]); // Clear addresses if no customer is selected
-            setIsAddressDropdownOpen(false); // Close dropdown
+            setAddresses([]); 
+            setIsAddressDropdownOpen(false); 
         }
     }, [selectedCustomer]);
     
@@ -84,14 +84,13 @@ const CreateServiceReport = ({user}) => {
             customer.CLastName.toLowerCase().includes(query.toLowerCase())
         );
         setFilteredCustomers(filtered);
-        setIsCustomerDropdownOpen(filtered.length > 0); // Open customer dropdown if results are available
+        setIsCustomerDropdownOpen(filtered.length > 0); 
     };
 
     const handleCustomerSelect = (customer) => {
         setSelectedCustomer(customer);
         setSearchQuery(`${customer.CFirstName} ${customer.CLastName}`);
         setFormData({ ...formData, CustomerID: customer.CustomerID });
-        setFilteredCustomers([]); // Close dropdown after selecting a customer
         setIsCustomerDropdownOpen(false);
     };
     const handleAddressSelect = (addressId) => {
@@ -104,48 +103,53 @@ const CreateServiceReport = ({user}) => {
     
         console.log("Updated Form Data:", { ...formData, CustAddID: addressId });
     
-        setIsAddressDropdownOpen(false); // Close the address dropdown after selecting
+        setIsAddressDropdownOpen(false); 
     };
 
     useEffect(() => {
         console.log("Updated form data:", formData);
-    }, [formData]); // This will run whenever formData changes
+    }, [formData]); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form Data being sent:', formData);
         console.log('Chemicals being sent:', chemicals);
     
-        const serviceReportResponse = await axios.post('http://localhost:3001/api/SR', formData);
-        const srID = serviceReportResponse.data.SrID;
-        console.log('Chemicals Logged:', serviceReportResponse.data);
+        try {
 
-        console.log(srID);
+            const serviceReportResponse = await axios.post('http://localhost:3001/api/SR', formData);
+            const srID = serviceReportResponse.data.srID;
+            console.log('Service Report Created:', serviceReportResponse.data);
+    
 
-        const payload = {
-            srID: srID,
-            chemicals: chemicals.map(chemical => ({
-                ChemicalUsed: chemical.ChemicalUsed,
-                Qty: chemical.Qty,
-                Unit: chemical.Unit,
-            }))
-        };
-
-
-        if (chemicals.length > 0) {
-            await axios.post('http://localhost:3001/api/SR/SRChems', payload);
-            console.log("great success!");
-        }
-
-            if(user){
+            const payload = {
+                srID: srID,
+                chemicals: chemicals.map(chemical => ({
+                    ChemicalUsed: chemical.ChemicalUsed,
+                    Qty: chemical.Qty,
+                    Unit: chemical.Unit,
+                }))
+            };
+    
+            // Send the chemicals if any exist
+            if (chemicals.length > 0) {
+                const chemicalsResponse = await axios.post('http://localhost:3001/api/SR/SRChems', payload);
+                console.log("Chemicals Logged:", chemicalsResponse.data);
+            }
+    
+            // Navigate based on user role
+            if (user) {
                 if (user.role === 'admin') {
-                     navigate('/admin-dashboard')
-                }
-                else{
-                    navigate('/dashboard')
+                    navigate('/admin-dashboard');
+                } else {
+                    navigate('/dashboard');
                 }
             }
-            };
+        } catch (error) {
+            console.error('Error during form submission:', error);
+            alert('Failed to submit service report or log chemicals. Please try again.');
+        }
+    };
+    
           
     return (
         <div className="service-report-container">

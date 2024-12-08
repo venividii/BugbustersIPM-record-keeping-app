@@ -5,19 +5,24 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const CreateServiceReport = (req, res) => {
-    console.log('Request Body:', req.body); 
+    console.log('CreateServiceReport: Request Body:', req.body); 
 
-    const {date,CustomerID,Treatment,PestNoted,ServiceRemarks,CustAddID,CreatedBy} = req.body;
+    const {Date,CustomerID,Treatment,PestNoted,ServiceRemarks,CustAddID,CreatedBy} = req.body;
+
     if (!Date||!CustomerID||!Treatment||!PestNoted||!ServiceRemarks||!CreatedBy||!CustAddID) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
+    console.log('Received Date1:', Date);
+
         const query = 'INSERT INTO ServiceReport(Date,CustomerID,Treatment,PestNoted,ServiceRemarks,CreatedBy,CustAddID) VALUES (?,?,?,?,?,?,?)';
     
     db.run(query, [Date,CustomerID,Treatment,PestNoted,ServiceRemarks,CreatedBy,CustAddID], function (err) {
       if (err) {
         return res.status(500).json({ error: 'Failed to create ServiceReport', details: err.message });
       }
-      res.status(201).json({ message: 'ServiceReport created', SrID: this.lastID });
+      res.status(201).json({ message: 'ServiceReport created', srID: this.lastID });
+      console.log('Received Date2:', Date);
+
     });
   };
 
@@ -42,7 +47,7 @@ export const CreateServiceReport = (req, res) => {
         ServiceReport = ?
     `;
   
-    db.get(query, [srID], (err, row) => {
+    db.get(query, [CustomerID], (err, row) => {
       if (err) {
         console.error('Error fetching Customer:', err.message);
         return res.status(500).json({
@@ -80,6 +85,9 @@ export const CreateServiceReport = (req, res) => {
         res.status(200).json({ message: 'SR deleted successfully' });
     });
   };
+
+
+
 
   export const updateSR= (req, res) => {
     const {srID } = req.params; // Get the EmployeeID from the route parameter
@@ -141,25 +149,45 @@ export const CreateServiceReport = (req, res) => {
     });
   };
   
-  
-export const LogChems = (req, res) => {
-    console.log('Request Body:', req.body); 
+  export const LogChems = (req, res) => {
+    console.log('Request Body:', req.body);
 
-    const {srID,ChemicalUsed,Qty,Unit } = req.body;
-    if (!srID||!ChemicalUsed||!Qty||!Unit) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    const { srID, chemicals } = req.body;
+
+    // Validate the payload structure
+    if (!srID || !Array.isArray(chemicals) || chemicals.length === 0) {
+        return res.status(400).json({ error: 'Missing required fields or invalid structure' });
     }
-        const query = 'INSERT INTO SRChemUsage(srID,ChemicalUsed,Qty,Unit) VALUES (?,?,?,?)';
-    
-    db.run(query, [srID,ChemicalUsed,Qty,Unit], function (err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to create ChemLog', details: err.message });
-      }
-      res.status(201).json({ message: 'ChemLog', SRChemUsageID: this.lastID });
+
+    // Prepare the SQL query
+    const query = 'INSERT INTO SRChemUsage(srID, ChemicalUsed, Qty, Unit) VALUES (?, ?, ?, ?)';
+
+    // Iterate over the chemicals array and insert each one
+    const promises = chemicals.map(({ ChemicalUsed, Qty, Unit }) => {
+        return new Promise((resolve, reject) => {
+            db.run(query, [srID, ChemicalUsed, Qty, Unit], function (err) {
+                if (err) {
+                    reject({ error: 'Failed to create ChemLog', details: err.message });
+                } else {
+                    resolve({ message: 'ChemLog created', SRChemUsageID: this.lastID });
+                }
+            });
+        });
     });
-  };
 
-
+    // Handle all insertions
+    Promise.all(promises)
+        .then(results => {
+            res.status(201).json({
+                message: 'All chemicals logged successfully',
+                results,
+            });
+        })
+        .catch(error => {
+            console.error('Error logging chemicals:', error);
+            res.status(500).json({ error: 'Failed to log some or all chemicals', details: error });
+        });
+};
 
   export const GetChemLogbyID= (req, res) => {
     const {SRChemUsageID} = req.params; // Extract srID from the request parameters
@@ -309,6 +337,22 @@ export const updateTechLog = (req, res) => {
     });
 };
 
+/*export const deleteTechLog = (req, res) => {
+    const { TechLogID } = req.params;
+
+    const query = 'DELETE FROM TechniciansPresent WHERE TechLogID = ?';
+
+    db.run(query, [TechLogID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete technician', details: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Technician not found' });
+        }
+        res.status(200).json({ message: 'TechLog deleted' });
+    });
+}; */
+
 export const deleteTechLog = (req, res) => {
     const { TechLogID } = req.params;
 
@@ -323,4 +367,119 @@ export const deleteTechLog = (req, res) => {
         }
         res.status(200).json({ message: 'TechLog deleted' });
     });
+}; 
+export const GetCustomerSR = async (req, res) => {
+    try {
+        const CustomerID = req.params.CustomerID;
+        console.log('Running GetCustomerSR');
+        console.log('CustomerID:', CustomerID);
+
+        const getServiceReportsQuery = `
+            SELECT * FROM ServiceReport WHERE CustomerID = ?;
+        `;
+
+        console.log('Query constructed:', getServiceReportsQuery);
+
+        // Fetch service reports from the database
+        const serviceReports = await new Promise((resolve, reject) => {
+            db.all(getServiceReportsQuery, [CustomerID], (err, rows) => {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    reject({ error: 'Failed to fetch service reports', details: err.message });
+                } else {
+                    console.log('Query result:', rows);
+                    resolve(rows);
+                }
+            });
+        });
+
+        // Handle case where no service reports are found
+        if (serviceReports.length === 0) {
+            console.log('No service reports found for CustomerID:', CustomerID);
+            res.status(200).json([]); // Return an empty array with a 200 status
+            return;
+        }
+    
+        // If service reports are found, return them
+        res.status(200).json(serviceReports);
+    } catch (error) {
+        console.error('Error in GetCustomerSR:', error);
+        res.status(500).json({ error: 'An error occurred while fetching service reports' });
+    }
 };
+
+export const DeleteCustomerSR = async (req, res) => {
+    try {
+        const CustomerID = req.params.CustomerID;
+        console.log('Deleting CustomerSR');
+        console.log('CustomerID:', CustomerID);
+
+        const deleteServiceReportsByCustomerIDQuery = `
+            DELETE FROM ServiceReport WHERE CustomerID = ?;
+        `;
+
+        const deleteResult = await new Promise((resolve, reject) => {
+            db.run(deleteServiceReportsByCustomerIDQuery, [CustomerID], function(err) {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    reject({ error: 'Failed to delete service reports', details: err.message });
+                } else {
+                    console.log('Deleted rows:', this.changes);  // `this.changes` contains the number of deleted rows
+                    resolve(this.changes);  // Return the number of rows deleted
+                }
+            });
+        });
+
+        // If no rows were deleted, notify the user
+        if (deleteResult === 0) {
+            console.log('No service reports found for CustomerID:', CustomerID);
+            return res.status(404).json({ message: 'No service reports found for the given customer.' });
+        }
+
+        // Successfully deleted service reports
+        res.status(200).json({ message: `${deleteResult} service report(s) deleted successfully.` });
+    } catch (error) {
+        console.error('Error in DeleteCustomerSR:', error);
+        res.status(500).json({ error: 'An error occurred while deleting service reports' });
+    }
+};
+export const GetChemsFromSR = async (req, res) => {
+    try {
+        const srID = req.params.srID;
+        console.log('Running Getting chems from SR');
+        console.log('srID:', srID);
+
+        const getSRUsageQuery = `
+            SELECT * FROM SRChemUsage WHERE srID = ?;
+        `;
+
+        console.log('Query constructed:', getSRUsageQuery);
+
+        // Fetch chemical usage data from the database
+        const chemUsage = await new Promise((resolve, reject) => {
+            db.all(getSRUsageQuery, [srID], (err, rows) => {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    reject({ error: 'Failed to fetch chemical usage', details: err.message });
+                } else {
+                    console.log('Query result:', rows);
+                    resolve(rows);
+                }
+            });
+        });
+
+        // Handle case where no chemical usage is found
+        if (chemUsage.length === 0) {
+            console.log('No chemical usage found for srID:', srID);
+            res.status(200).json([]); // Return an empty array with a 200 status
+            return;
+        }
+
+        // Return the fetched chemical usage data
+        res.status(200).json(chemUsage);
+    } catch (error) {
+        console.error('Error in GetChemsFromSR:', error);
+        res.status(500).json({ error: 'An error occurred while fetching chemical usage' });
+    }
+};
+

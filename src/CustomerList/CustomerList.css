@@ -173,3 +173,27 @@ button {
 button:hover {
     background-color: #e53935;
 }
+
+.service-reports-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.service-reports-table th, .service-reports-table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.service-reports-table th {
+    background-color: #f4f4f4;
+}
+
+.service-reports-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.action-icons{
+    display:flex;
+    gap: 5px;
+}

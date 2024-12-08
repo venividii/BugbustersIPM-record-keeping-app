@@ -1,8 +1,8 @@
 import express from 'express';
 
 import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee,Login} from '../controllers/EmployeeController.js';
-import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,DeleteCustomerAddresses,} from '../controllers/CustomerController.js';
-import {CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,/*GetChemLogbyID,*/DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog/*GetCustomerSR*/} from '../controllers/SRController.js';
+import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,DeleteCustomerAddresses} from '../controllers/CustomerController.js';
+import {CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,/*GetChemLogbyID,*/DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog,GetCustomerSR,DeleteCustomerSR,GetChemsFromSR} from '../controllers/SRController.js';
 //,getTechLog,updateTechLog,deleteTechLog}w
 const router = express.Router();
 
@@ -49,16 +49,16 @@ router.get('/SR/:srID', GetSRbyID);
 router.post('/SR/SRChems',LogChems);
 router.delete('/SR/SRChems/:SRChemUsageID', DeleteChemLog);
 router.put('/SR/SRChems/:SRChemUsageID', UpdateChemLog);
+router.get('SR/SRChems/:SR',GetChemsFromSR);
 
 router.post('/SR/tech', createTechLog);
 router.get('/SR/tech/:TechLogID', getTechLog);//
 router.put('/SR/tech/:TechLogID', updateTechLog);
-router.delete('/SR/tech/:TechLogID', deleteTechoLog);
-
+router.delete('/SR/tech/:TechLogID', deleteTechLog);
+router.delete('/SR/all/:CustomerID', DeleteCustomerSR);
+router.get('SR/ALL')
 
 //router.delete('/SR/customer/all/:CustomerID',deleteServiceReportsByCustomerID );
 //router.delete('/SR/chems/all/:serviceReportId',deleteSRchemUsageByServiceReportIDs );
-
-
 
 export default router;
