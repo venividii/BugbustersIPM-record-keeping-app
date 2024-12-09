@@ -580,3 +580,26 @@ export const DeleteCustomerAddresses = (req, res) => {
     res.status(200).json({ message: 'Addresses deleted successfully' });
   });
 };
+
+
+export const checkNumber = async (req, res) => {
+  const { CContact } = req.params;  // Access CContact from route parameters
+  console.log('Checking phone number:', CContact);
+
+  // Use a raw query to check if the phone number exists
+  const query = `SELECT * FROM CustomerProfile WHERE CContact = ? LIMIT 1`;
+
+  db.get(query, [CContact], (err, row) => {
+    if (err) {
+      console.error('Error checking phone number:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+
+    if (row) {
+      return res.json({ exists: true });  // Customer exists
+    }
+
+
+    return res.json({ exists: false });  // Customer does not exist
+  });
+};

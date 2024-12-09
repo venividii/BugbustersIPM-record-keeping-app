@@ -514,3 +514,23 @@ export const GetServiceReportsByAddress = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching service reports' });
     }
 };
+
+export const DeleteChemLogsBySRID = (req, res) => {
+    const { srID } = req.params;
+
+    if (!srID) {
+        return res.status(400).json({ error: 'srID is required' });
+    }
+
+    const query = 'DELETE FROM SRchemUsage WHERE srID = ?';
+
+    db.run(query, [srID], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete ChemLogs', details: err.message });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'No ChemLogs found for the given srID' });
+        }
+        res.status(200).json({ message: 'ChemLogs deleted successfully' });
+    });
+};

@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee,Login} from '../controllers/EmployeeController.js';
-import { CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,DeleteCustomerAddresses} from '../controllers/CustomerController.js';
-import {CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,/*GetChemLogbyID,*/DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog,GetCustomerSR,DeleteCustomerSR,GetChemsFromSR,GetServiceReportsByAddress} from '../controllers/SRController.js';
+import { createEmployeeAccount, getAllEmployees,getEmployeeById,deleteEmployee,updateEmployee,Login,} from '../controllers/EmployeeController.js';
+import { checkNumber,CreateCustomerProfile, deleteCustomer, updateCustomer,getAllCustomers,GetCustomerById, CreateCustomerAddress,ReadCustomerAddress,UpdateCustomerAddress,DeleteCustomerAddress, LogQuoteChems, GetQuoteChemLog,DeleteQChemLog,UpdateQChemLog,CreateQuotation,GetQuotation,DeleteQuotation,UpdateQuotation,DeleteCustomerAddresses} from '../controllers/CustomerController.js';
+import {CreateServiceReport,deleteSR,GetSRbyID,updateSR,LogChems,/*GetChemLogbyID,*/DeleteChemLog,UpdateChemLog,createTechLog,getTechLog,updateTechLog,deleteTechLog,GetCustomerSR,DeleteCustomerSR,GetChemsFromSR,GetServiceReportsByAddress,DeleteChemLogsBySRID} from '../controllers/SRController.js';
 //,getTechLog,updateTechLog,deleteTechLog}w
 const router = express.Router();
 
@@ -20,12 +20,14 @@ router.get('/customer', getAllCustomers);
 router.delete('/customer/:CustomerID', deleteCustomer);
 router.get('/customer/:CustomerID',GetCustomerById); 
 router.put('/customer/:CustomerID', updateCustomer);
+router.get('/customer/exists/:CContact',checkNumber);
 
 router.post('/customer/address',CreateCustomerAddress);
 router.delete('/customer/address/:CustAddID', DeleteCustomerAddress);
 router.get('/customer/address/:CustAddID', ReadCustomerAddress); 
 router.put('/customer/address/:CustAddID', UpdateCustomerAddress);
 router.delete('/customer/address/all/:CustomerID', DeleteCustomerAddresses);
+
 
 
 router.post('/customer/address/quote',CreateQuotation);
@@ -52,6 +54,8 @@ router.post('/SR/SRChems',LogChems);
 router.delete('/SR/SRChems/:SRChemUsageID', DeleteChemLog);
 router.put('/SR/SRChems/:SRChemUsageID', UpdateChemLog);
 router.get('/SR/SRChems/:srID',GetChemsFromSR);
+router.delete('/SR/SRChems/SRID/:srID', DeleteChemLogsBySRID);
+
 
 router.post('/SR/tech', createTechLog);
 router.get('/SR/tech/:TechLogID', getTechLog);//

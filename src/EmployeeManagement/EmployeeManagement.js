@@ -35,29 +35,59 @@ const EmployeeManagement = ({ user }) => {
         setFormData({ ...formData, [name]: value });
     };
 
+
+
     const handleCreateTech = async (e) => {
         e.preventDefault();
+    
         const { FirstName, LastName, PhoneNumber, Username, Role, Password } = formData;
-
-        if (FirstName && LastName && PhoneNumber && Username && Role && Password) {
-            try {
-                const response = await axios.post('http://localhost:3001/api/employee', formData);
-                const newTechnician = response.data;
-
-                setTechnicians([...technicians, { ...newTechnician, Password: '********' }]);
-                
-                setFormData({ FirstName: '', LastName: '', PhoneNumber: '', Username: '', Role: 'technician', Password: '' });
-                
-                alert(`Technician ${newTechnician.Username} created successfully!`);
-            } catch (error) {
-                console.error('Error creating technician:', error);
-                alert('Failed to create technician. Please try again.');
-            }
-        } else {
-            alert("Please fill in all fields.");
+    
+        // Validate the phone number format (assumes validatePhoneNumber is defined elsewhere)
+        const validatePhoneNumber = (phone) => {
+            const phoneRegex = /^\d{11}$/;
+            return phoneRegex.test(phone);
+        };
+    
+        if (!validatePhoneNumber(PhoneNumber)) {
+            alert('Please enter a valid 11-digit phone number.');
+            return;
+        }
+    
+        // Check for duplicate Username or PhoneNumber
+        const isDuplicate = technicians.some(
+            (tech) => tech.Username === Username || tech.PhoneNumber === PhoneNumber
+        );
+    
+        if (isDuplicate) {
+            alert('A technician with this Username or Phone Number already exists.');
+            return;
+        }
+    
+        // Check if all required fields are filled
+        if (!FirstName || !LastName || !PhoneNumber || !Username || !Role || !Password) {
+            alert('Please fill in all fields.');
+            return;
+        }
+    
+        // Proceed with creation if all validations pass
+        try {
+            const response = await axios.post('http://localhost:3001/api/employee', formData);
+            const newTechnician = response.data;
+    
+            // Update the state with the new technician (masking Password for security)
+            setTechnicians([...technicians, { ...newTechnician, Password: '********' }]);
+    
+            // Clear the form data after successful submission
+            setFormData({ FirstName: '', LastName: '', PhoneNumber: '', Username: '', Role: 'technician', Password: '' });
+    
+            alert(`Technician ${newTechnician.Username} created successfully!`);
+        } catch (error) {
+            console.error('Error creating technician:', error);
+            alert('Failed to create technician. Please try again.');
         }
     };
-
+    
+    
     const handleDeleteTech = async (username) => {
         const techToDelete = technicians.find(tech => tech.Username === username);
         

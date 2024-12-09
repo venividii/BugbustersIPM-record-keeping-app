@@ -3,6 +3,7 @@ import axios from 'axios';
 import './CustomerList.css';
 import { FaEdit, FaTrash, FaAddressBook, FaSearch } from 'react-icons/fa';
 
+
 const CustomerList = ({ user, searchTerm }) => {
     const [customers, setCustomers] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null); // For current customer selection
@@ -44,30 +45,53 @@ const CustomerList = ({ user, searchTerm }) => {
     // Handle address deletion
     const handleDeleteAddress = async (CustAddID) => {
         try {
-
+            // Step 1: Fetch service reports associated with the address
             const serviceReportsResponse = await axios.get(`http://localhost:3001/api/SR/address/${CustAddID}`);
             const serviceReportIDs = serviceReportsResponse.data.map((report) => report.srID);
             console.log('Service Reports to be deleted:', serviceReportIDs);
     
-            await Promise.all(
-                serviceReportIDs.map((srID) =>
-                    axios.delete(`http://localhost:3001/api/SR/${srID}`)
-                )
-            );
-            console.log('Deleted service reports successfully.');
+            // Step 2: Delete all ChemLogs if there are service reports
+            if (serviceReportIDs.length > 0) {
+                await Promise.all(
+                    serviceReportIDs.map((srID) =>
+                        axios.delete(`http://localhost:3001/api/SR/SRChems/SRID/${srID}`).catch((err) => {
+                            console.warn(`No ChemLogs found for srID ${srID}:`, err.message);
+                        })
+                    )
+                );
+                console.log('Deleted ChemLogs successfully.');
+            } else {
+                console.log('No service reports found, skipping ChemLog deletion.');
+            }
     
-            // Step 3: Delete the address
+            // Step 3: Delete the service reports if there are any
+            if (serviceReportIDs.length > 0) {
+                await Promise.all(
+                    serviceReportIDs.map((srID) =>
+                        axios.delete(`http://localhost:3001/api/SR/${srID}`).catch((err) => {
+                            console.warn(`Failed to delete service report with srID ${srID}:`, err.message);
+                        })
+                    )
+                );
+                console.log('Deleted service reports successfully.');
+            } else {
+                console.log('No service reports found, skipping service report deletion.');
+            }
+    
+            // Step 4: Delete the address
             await axios.delete(`http://localhost:3001/api/customer/address/${CustAddID}`);
-            
-            // Step 4: Update state to remove the address from the UI
+            console.log('Deleted address successfully.');
+    
+            // Step 5: Update state to remove the address from the UI
             setAddresses((prevAddresses) => prevAddresses.filter((address) => address.CustAddID !== CustAddID));
-            
+    
             alert('Address and related service reports deleted successfully!');
         } catch (error) {
             console.error('Error deleting address or related service reports:', error);
             alert('Failed to delete address and related service reports');
         }
     };
+    
     
 // Add a new address for a customer
 const handleAddAddress = async (newAddress) => {
@@ -90,21 +114,69 @@ const handleAddAddress = async (newAddress) => {
 
 const handleRemoveCustomer = async (CustomerID) => {
     try {
+        // Step 1: Fetch all service reports for the customer
+        let serviceReportIDs = [];
         try {
-            await axios.delete(`http://localhost:3001/api/SR/all/${CustomerID}`);
+            const serviceReportsResponse = await axios.get(`http://localhost:3001/api/SR/all/${CustomerID}`);
+            serviceReportIDs = serviceReportsResponse.data.map((report) => report.srID);
+            console.log('Service Reports to be deleted:', serviceReportIDs);
         } catch (error) {
-            console.log('No service reports to delete or error occurred:', error);
+            console.log('No service reports found or error occurred:', error);
         }
-        await axios.delete(`http://localhost:3001/api/customer/address/all/${CustomerID}`);
-        // Attempt to delete the customer
-        await axios.delete(`http://localhost:3001/api/customer/${CustomerID}`);
-        // Update the customer list after deletion
-        setCustomers(customers.filter((customer) => customer.CustomerID !== CustomerID));
 
+        // Step 2: Delete associated ChemLogs for each service report
+        if (serviceReportIDs.length > 0) {
+            await Promise.all(
+                serviceReportIDs.map((srID) =>
+                    axios.delete(`http://localhost:3001/api/SR/SRChems/SRID/${srID}`).catch((err) => {
+                        console.warn(`No ChemLogs found for srID ${srID}:`, err.message);
+                    })
+                )
+            );
+            console.log('Deleted ChemLogs successfully.');
+        } else {
+            console.log('No service reports found, skipping ChemLog deletion.');
+        }
+
+        // Step 3: Delete the service reports
+        if (serviceReportIDs.length > 0) {
+            await Promise.all(
+                serviceReportIDs.map((srID) =>
+                    axios.delete(`http://localhost:3001/api/SR/${srID}`).catch((err) => {
+                        console.warn(`Failed to delete service report with srID ${srID}:`, err.message);
+                    })
+                )
+            );
+            console.log('Deleted service reports successfully.');
+        } else {
+            console.log('No service reports to delete.');
+        }
+
+        // Step 4: Delete all addresses associated with the customer
+        await axios.delete(`http://localhost:3001/api/customer/address/all/${CustomerID}`);
+        console.log('Deleted addresses successfully.');
+
+        // Step 5: Delete the customer
+        await axios.delete(`http://localhost:3001/api/customer/${CustomerID}`);
+        console.log('Deleted customer successfully.');
+
+        // Step 6: Update the customer list after deletion
+        setCustomers(customers.filter((customer) => customer.CustomerID !== CustomerID));
         alert('Customer and related data deleted successfully!');
     } catch (error) {
         console.error('Error removing customer:', error);
         alert('Error removing customer');
+    }
+};
+
+const checkPhoneNumberExists = async (phoneNumber) => {
+    console.log('validating:', phoneNumber);
+    try {
+        const response = await axios.get(`http://localhost:3001/api/customer/exists/${phoneNumber}`);
+        return response.data.exists;  // returns true or false
+    } catch (error) {
+        console.error('Error checking phone number:', error);
+        return false;  // In case of error, assume the phone number doesn't exist
     }
 };
 
@@ -116,6 +188,7 @@ const handleRemoveCustomer = async (CustomerID) => {
             CContact: customer.CContact,
             CustomerID: customer.CustomerID,
         });
+
         setIsViewingReports(false); // Show service report modal
         setLoadingReports(false);
         setIsViewingAddresses(false);
@@ -124,21 +197,36 @@ const handleRemoveCustomer = async (CustomerID) => {
 
     const handleSaveCustomer = async (event) => {
         event.preventDefault();
+    
+        // Validate if the phone number exists in the database
+        const phoneExists = await checkPhoneNumberExists(editCustomerData.CContact);
+ 
+        if (phoneExists && selectedCustomer?.CContact !== editCustomerData.CContact) {
+            alert('This phone number is already associated with another customer.');
+            return; 
+        } else if (phoneExists && selectedCustomer?.CContact === editCustomerData.CContact){
+            // Logic if the phone number does not exist or belongs to the same customer
+            alert('User already has this phone number.');
+            return;
+        }
         try {
+            // Proceed with the update request
             await axios.put(`http://localhost:3001/api/customer/${editCustomerData.CustomerID}`, editCustomerData);
-
+    
+            // Update customers state to reflect the changes
             setCustomers(customers.map((customer) =>
                 customer.CustomerID === editCustomerData.CustomerID ? editCustomerData : customer
             ));
+    
             alert('Customer updated successfully!');
-            setIsEditing(false); // Close edit modal
-            setSelectedCustomer(null);
+            setIsEditing(false);  // Close the edit modal
+            setSelectedCustomer(null);  // Clear selected customer
         } catch (error) {
             console.error('Error updating customer:', error);
             alert('Error updating customer');
         }
     };
-
+    
     const handleEditInputChange = (e) => {
         const { name, value } = e.target;
         setEditCustomerData((prevData) => ({
@@ -236,12 +324,38 @@ const handleRemoveCustomer = async (CustomerID) => {
                             <td>{customer.CContact}</td>
                             <td>
 
-                                <div className="action-icons">
-                                    <FaAddressBook onClick={() => handleShowAddressModal(customer)} className="action-icon address-icon" />
-                                    <FaSearch onClick={() => handleFetchServiceReports(customer)} className="action-icon search-icon" />
-                                    <FaEdit onClick={() => handleEditCustomer(customer)} className="action-icon edit-icon" />
-                                    <FaTrash onClick={() => handleRemoveCustomer(customer.CustomerID)} className="action-icon delete-icon" />
-                                </div>
+                            <div className="action-icons">
+    <div className="tooltip-wrapper">
+        <FaAddressBook 
+            onClick={() => handleShowAddressModal(customer)} 
+            className="action-icon address-icon" 
+        />
+        <span className="tooltip">View and Create Addresses</span>
+    </div>
+    <div className="tooltip-wrapper">
+        <FaSearch 
+            onClick={() => handleFetchServiceReports(customer)} 
+            className="action-icon search-icon" 
+        />
+        <span className="tooltip">View Service Reports</span>
+    </div>
+    <div className="tooltip-wrapper">
+        <FaEdit 
+            onClick={() => handleEditCustomer(customer)} 
+            className="action-icon edit-icon" 
+        />
+        <span className="tooltip">Edit Customer</span>
+    </div>
+    <div className="tooltip-wrapper">
+        <FaTrash 
+            onClick={() => handleRemoveCustomer(customer.CustomerID)} 
+            className="action-icon delete-icon" 
+        />
+        <span className="tooltip">Delete Customer</span>
+    </div>
+</div>
+
+
                             </td>
                         </tr>
                     ))}
@@ -291,34 +405,33 @@ const handleRemoveCustomer = async (CustomerID) => {
                 </div>
             )}
 
-       {/* Service Reports Section */}
-{isViewingReports && serviceReports.length > 0 && (
+{/* Service Reports Section */}
+{isViewingReports && (
     <div className="service-reports-section">
         <h3>Service Reports for {selectedCustomer?.CFirstName} {selectedCustomer?.CLastName}</h3>
-        
 
-{/* Address Selector */}
-<div className="address-selector">
-    <label htmlFor="addressFilter" className="address-label">Filter by Address:</label>
-    <select
-        id="addressFilter"
-        className="address-dropdown"
-        value={selectedAddress?.CustAddID || ''}
-        onChange={(e) => handleAddressChange(e.target.value)}
-    >
-        <option value="">All Addresses</option>
-        {customerAddresses.map((address) => (
-            <option key={address.CustAddID} value={address.CustAddID}>
-               {address.AddLine1}, {address.Barangay}, {address.City}
-            </option>
-        ))}
-    </select>
-</div>
-
-
+        {/* Address Selector */}
+        <div className="address-selector">
+            <label htmlFor="addressFilter" className="address-label">Filter by Address:</label>
+            <select
+                id="addressFilter"
+                className="address-dropdown"
+                value={selectedAddress?.CustAddID || ''}
+                onChange={(e) => handleAddressChange(e.target.value)}
+            >
+                <option value="">All Addresses</option>
+                {customerAddresses.map((address) => (
+                    <option key={address.CustAddID} value={address.CustAddID}>
+                        {address.AddLine1}, {address.Barangay}, {address.City}
+                    </option>
+                ))}
+            </select>
+        </div>
 
         {loadingReports ? (
             <p>Loading reports...</p>
+        ) : serviceReports.length === 0 ? (
+            <p>Customer does not have any service reports.</p>  
         ) : (
             <table className="service-reports-table">
                 <thead>
@@ -349,9 +462,11 @@ const handleRemoveCustomer = async (CustomerID) => {
                 </tbody>
             </table>
         )}
+
         <button onClick={handleCloseModals}>Close</button>
     </div>
 )}
+
 
                    {/* Address Modal */}
                    {isViewingAddresses && (

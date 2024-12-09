@@ -320,7 +320,7 @@ const CreateServiceReport = ({user}) => {
 
                 <div className="form-actions">
                     <button type="submit">Submit Report</button>
-                    <button type="button" onClick={() => navigate('/dashboard')}>Cancel</button>
+                    <button type="button" onClick={() => navigate('/')}>Cancel</button>
                 </div>
             </form>
         </div>
