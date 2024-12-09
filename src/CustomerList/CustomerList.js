@@ -13,6 +13,22 @@ const CustomerList = ({ user, searchTerm }) => {
     const [isViewingAddresses, setIsViewingAddresses] = useState(false); // For viewing addresses
     const [isViewingReports, setIsViewingReports] = useState(false); // For viewing service reports
     const [loadingReports, setLoadingReports] = useState(false); // For loading state of reports
+    const [customerAddresses, setCustomerAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [filteredServiceReports, setFilteredServiceReports] = useState([]);
+
+    const handleAddressChange = (custAddID) => {
+        const selected = customerAddresses.find((address) => address.CustAddID === parseInt(custAddID));
+        setSelectedAddress(selected);
+    
+        if (selected) {
+            const filtered = serviceReports.filter((report) => report.CustAddID === selected.CustAddID);
+            setFilteredServiceReports(filtered);
+        } else {
+            setFilteredServiceReports(serviceReports); // Show all reports if no address is selected
+        }
+    };
+    
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -26,20 +42,33 @@ const CustomerList = ({ user, searchTerm }) => {
         fetchCustomers();
     }, []);
     // Handle address deletion
-const handleDeleteAddress = async (CustAddID) => {
-    try {
-        // Send a DELETE request to remove the address from the backend
-        await axios.delete(`http://localhost:3001/api/customer/address/${CustAddID}`);
-        
-        // After deleting, filter out the deleted address from the list in the state
-        setAddresses((prevAddresses) => prevAddresses.filter((address) => address.CustAddID !== CustAddID));
-        
-        alert('Address deleted successfully!');
-    } catch (error) {
-        console.error('Error deleting address:', error);
-        alert('Failed to delete address');
-    }
-};
+    const handleDeleteAddress = async (CustAddID) => {
+        try {
+
+            const serviceReportsResponse = await axios.get(`http://localhost:3001/api/SR/address/${CustAddID}`);
+            const serviceReportIDs = serviceReportsResponse.data.map((report) => report.srID);
+            console.log('Service Reports to be deleted:', serviceReportIDs);
+    
+            await Promise.all(
+                serviceReportIDs.map((srID) =>
+                    axios.delete(`http://localhost:3001/api/SR/${srID}`)
+                )
+            );
+            console.log('Deleted service reports successfully.');
+    
+            // Step 3: Delete the address
+            await axios.delete(`http://localhost:3001/api/customer/address/${CustAddID}`);
+            
+            // Step 4: Update state to remove the address from the UI
+            setAddresses((prevAddresses) => prevAddresses.filter((address) => address.CustAddID !== CustAddID));
+            
+            alert('Address and related service reports deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting address or related service reports:', error);
+            alert('Failed to delete address and related service reports');
+        }
+    };
+    
 // Add a new address for a customer
 const handleAddAddress = async (newAddress) => {
     try {
@@ -61,19 +90,14 @@ const handleAddAddress = async (newAddress) => {
 
 const handleRemoveCustomer = async (CustomerID) => {
     try {
-        // Attempt to delete service reports; ignore errors if no reports exist
         try {
             await axios.delete(`http://localhost:3001/api/SR/all/${CustomerID}`);
         } catch (error) {
             console.log('No service reports to delete or error occurred:', error);
         }
-
-        // Attempt to delete addresses
         await axios.delete(`http://localhost:3001/api/customer/address/all/${CustomerID}`);
-
         // Attempt to delete the customer
         await axios.delete(`http://localhost:3001/api/customer/${CustomerID}`);
-
         // Update the customer list after deletion
         setCustomers(customers.filter((customer) => customer.CustomerID !== CustomerID));
 
@@ -144,15 +168,18 @@ const handleRemoveCustomer = async (CustomerID) => {
         setLoadingReports(true);
     
         try {
-            // Fetch service reports for the selected customer
+            // Fetch customer addresses
+            const addressResponse = await axios.get(`http://localhost:3001/api/customer/address/${customer.CustomerID}`);
+            setCustomerAddresses(addressResponse.data);
+    
+
             const response = await axios.get(`http://localhost:3001/api/SR/all/${customer.CustomerID}`);
             const serviceReports = response.data;
     
-            // Extract service report IDs
+
             const serviceReportIDs = serviceReports.map((report) => report.srID);
-            console.log('Service Report IDs:', serviceReportIDs);
     
-            // Fetch chemical usage for each service report concurrently
+
             const chemicalsData = await Promise.all(
                 serviceReportIDs.map((srID) =>
                     axios.get(`http://localhost:3001/api/SR/SRChems/${srID}`).then((res) => res.data)
@@ -167,6 +194,7 @@ const handleRemoveCustomer = async (CustomerID) => {
     
             // Update state with enriched service reports
             setServiceReports(enhancedReports);
+            setFilteredServiceReports(enhancedReports); // Initially, show all reports
     
             console.log('Enhanced Service Reports:', enhancedReports);
         } catch (error) {
@@ -177,7 +205,6 @@ const handleRemoveCustomer = async (CustomerID) => {
         }
     };
     
-
     const handleCloseModals = () => {
         setIsEditing(false);
         setIsViewingAddresses(false);
@@ -221,7 +248,7 @@ const handleRemoveCustomer = async (CustomerID) => {
                 </tbody>
             </table>
 
-            {/* Edit Customer Form */}
+
             {isEditing && (
                 <div className="edit-customer-form">
                     <h3>Edit Customer</h3>
@@ -264,10 +291,32 @@ const handleRemoveCustomer = async (CustomerID) => {
                 </div>
             )}
 
-        {/* Service Reports Section */}
+       {/* Service Reports Section */}
 {isViewingReports && serviceReports.length > 0 && (
     <div className="service-reports-section">
         <h3>Service Reports for {selectedCustomer?.CFirstName} {selectedCustomer?.CLastName}</h3>
+        
+
+{/* Address Selector */}
+<div className="address-selector">
+    <label htmlFor="addressFilter" className="address-label">Filter by Address:</label>
+    <select
+        id="addressFilter"
+        className="address-dropdown"
+        value={selectedAddress?.CustAddID || ''}
+        onChange={(e) => handleAddressChange(e.target.value)}
+    >
+        <option value="">All Addresses</option>
+        {customerAddresses.map((address) => (
+            <option key={address.CustAddID} value={address.CustAddID}>
+               {address.AddLine1}, {address.Barangay}, {address.City}
+            </option>
+        ))}
+    </select>
+</div>
+
+
+
         {loadingReports ? (
             <p>Loading reports...</p>
         ) : (
@@ -282,7 +331,7 @@ const handleRemoveCustomer = async (CustomerID) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {serviceReports.map((report) => (
+                    {filteredServiceReports.map((report) => (
                         <tr key={report.srID}>
                             <td>{report.srID}</td>
                             <td>{report.Date}</td>

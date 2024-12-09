@@ -197,3 +197,38 @@ button:hover {
     display:flex;
     gap: 5px;
 }
+
+.address-selector {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.address-label {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+}
+
+.address-dropdown {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.address-dropdown:hover {
+    border-color: #888;
+    background-color: #fff;
+}
+
+.address-dropdown:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}

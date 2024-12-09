@@ -483,3 +483,34 @@ export const GetChemsFromSR = async (req, res) => {
     }
 };
 
+export const GetServiceReportsByAddress = async (req, res) => {
+    try {
+        const { CustAddID } = req.params;
+
+        if (!CustAddID) {
+            return res.status(400).json({ error: 'CustAddID is required' });
+        }
+
+        console.log('Fetching Service Reports for Address:', CustAddID);
+
+        const getReportsQuery = `
+            SELECT * FROM ServiceReport WHERE CustAddID = ?;
+        `;
+
+        const serviceReports = await new Promise((resolve, reject) => {
+            db.all(getReportsQuery, [CustAddID], (err, rows) => {
+                if (err) {
+                    console.error('Database error:', err.message);
+                    reject({ error: 'Failed to fetch service reports', details: err.message });
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+
+        res.status(200).json(serviceReports);
+    } catch (error) {
+        console.error('Error in GetServiceReportsByAddress:', error);
+        res.status(500).json({ error: 'An error occurred while fetching service reports' });
+    }
+};
