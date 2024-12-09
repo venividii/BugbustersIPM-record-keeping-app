@@ -49,7 +49,7 @@ router.get('/SR/:srID', GetSRbyID);
 router.post('/SR/SRChems',LogChems);
 router.delete('/SR/SRChems/:SRChemUsageID', DeleteChemLog);
 router.put('/SR/SRChems/:SRChemUsageID', UpdateChemLog);
-router.get('SR/SRChems/:SR',GetChemsFromSR);
+router.get('/SR/SRChems/:srID',GetChemsFromSR);
 
 router.post('/SR/tech', createTechLog);
 router.get('/SR/tech/:TechLogID', getTechLog);//
@@ -58,7 +58,6 @@ router.delete('/SR/tech/:TechLogID', deleteTechLog);
 router.delete('/SR/all/:CustomerID', DeleteCustomerSR);
 router.get('SR/ALL')
 
-//router.delete('/SR/customer/all/:CustomerID',deleteServiceReportsByCustomerID );
 //router.delete('/SR/chems/all/:serviceReportId',deleteSRchemUsageByServiceReportIDs );
 
 export default router;

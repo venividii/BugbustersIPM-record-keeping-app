@@ -142,27 +142,41 @@ const handleRemoveCustomer = async (CustomerID) => {
         setSelectedCustomer(customer);
         setIsViewingReports(true); // Show service report modal
         setLoadingReports(true);
+    
         try {
+            // Fetch service reports for the selected customer
             const response = await axios.get(`http://localhost:3001/api/SR/all/${customer.CustomerID}`);
-
-            // Set the service reports state
-            setServiceReports(response.data);
-            
-            // Extract service report IDs from response.data
-            const serviceReportIDs = response.data.map((report) => report.srID);
-            
+            const serviceReports = response.data;
+    
+            // Extract service report IDs
+            const serviceReportIDs = serviceReports.map((report) => report.srID);
             console.log('Service Report IDs:', serviceReportIDs);
-            
-
-        
-            console.log(response.data);
+    
+            // Fetch chemical usage for each service report concurrently
+            const chemicalsData = await Promise.all(
+                serviceReportIDs.map((srID) =>
+                    axios.get(`http://localhost:3001/api/SR/SRChems/${srID}`).then((res) => res.data)
+                )
+            );
+    
+            // Merge chemical data into service reports
+            const enhancedReports = serviceReports.map((report, index) => ({
+                ...report,
+                chemicals: chemicalsData[index], // Chemicals for this report
+            }));
+    
+            // Update state with enriched service reports
+            setServiceReports(enhancedReports);
+    
+            console.log('Enhanced Service Reports:', enhancedReports);
         } catch (error) {
-            console.error('Error fetching service reports:', error);
-            alert('Failed to fetch service reports');
+            console.error('Error fetching service reports or chemical data:', error);
+            alert('Failed to fetch service reports or chemical data');
         } finally {
             setLoadingReports(false);
         }
     };
+    
 
     const handleCloseModals = () => {
         setIsEditing(false);
